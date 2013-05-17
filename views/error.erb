@@ -1,0 +1,36 @@
+<% @title = "Error #{@error.id}" %>
+
+<ul>
+  <li>Class: <%=h @error.error_class %></li>
+  <li>Message: <%=h @error.message %></li>
+  <li>Occured On: <%=h @error.created_at.strftime('%F %T') %></li>
+</ul>
+
+<h2>Backtrace</h2>
+<ol>
+<% @error.backtrace.each do |line| %>
+  <li><%=h line %></li>
+<% end %>
+</ol>
+
+<% [:params, :session, :env].each do |type| %>
+  <% if (h = @error.send(type)) && (h = h.sort) %>
+  <table class="table table-bordered table-striped error-info">
+  <caption><%= type %></caption>
+  <thead>
+    <tr>
+      <th class="key">Key</th>
+      <th class="value">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% h.each do |k, v| %>
+      <tr>
+        <td class="key"><%=h k %></td>
+        <td class="value"><%=h v %></td>
+      </tr>
+    <% end %>
+  </tbody>
+  </table>
+  <% end %>
+<% end %>

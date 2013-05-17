@@ -1,0 +1,12 @@
+<% @title = 'Applications' %>
+
+<form action="/choose_application" method="post">
+  <%= Rack::Csrf.tag(env) %>
+  <select name="id">
+    <option></option>
+    <% @apps.each do |app| %>
+      <option value="<%= app.id %>"><%=h app.name %></option>
+    <% end %>
+  </select><br />
+  <input class="btn btn-primary" type="submit" value="Choose Application" />
+</form>

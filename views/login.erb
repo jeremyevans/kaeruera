@@ -1,0 +1,22 @@
+<% @title = 'Login' %>
+
+<form action="/login" class="form-horizontal" method="post">
+  <%= Rack::Csrf.tag(env) %>
+  <fieldset>
+    <div class="control-group">
+      <label class="control-label" for="email">Email</label>
+      <div class="controls">
+        <input type="text" class="input-xlarge" name="email" id="email" placeholder="email"/>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="password">Password</label>
+      <div class="controls">
+        <input type="password" class="input-xlarge" name="password" id="password" placeholder="password"/>
+      </div>
+    </div>
+    <div class="form-actions">
+      <input type="submit" class="btn-large" value="Login"/>
+    </div>
+  </fieldset>
+</form>

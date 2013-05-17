@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>KaeruErr<%= " - #{@title}" if @title %></title>
+<link rel="stylesheet" type="text/css" href="/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/application.css" />
+</head>
+
+<body>
+<div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a href="/errors" class="brand">KaeruErr<%=h ": #{session[:application_name]}" if session[:application_name] %></a>
+
+      <ul class="nav">
+        <% if session[:application_id] %>
+          <li><a href="/search">Search</a></li>
+
+          <li class="divider-vertical"></li>
+          <li><a href="/choose_application">Change Application</a></li>
+        <% end %>
+      </ul>
+      <% if session[:user_id] %>
+        <form action="/logout" class="button_to" method="post">
+          <%= Rack::Csrf.tag(env) %>
+          <input class="btn btn-warning pull-right" type="submit" value="Logout" />
+        </form>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="content">
+<%= "<h1>#{@title}</h1>" if @title %>
+<%= yield %>
+</div>
+
+</body></html>

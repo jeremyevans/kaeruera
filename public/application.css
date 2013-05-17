@@ -1,0 +1,19 @@
+.error-info {
+  width: 960px;
+}
+.error-info .key {
+  width: 200px;
+}
+.error-info .value {
+  width: 700px;
+}
+.error-info td, .error-info th {
+  display: inline-block;
+  white-space: pre-wrap;  
+  word-wrap: break-word;
+}
+table caption {
+  text-align: left;
+  font-size: 24px;
+  padding: 5px;
+}
