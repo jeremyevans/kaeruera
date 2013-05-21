@@ -5,7 +5,7 @@ require 'logger'
 
 Sequel.extension :pg_array, :pg_hstore, :pg_json, :pg_array_ops, :pg_hstore_ops
 
-DB = Sequel.connect(ENV['DATABASE_URL'] || 'postgres:///?user=kaeruerr')
+DB = Sequel.connect(ENV['DATABASE_URL'] || 'postgres:///?user=kaeruera')
 
 DB.extension :pg_array, :pg_hstore, :pg_json
 
@@ -24,6 +24,6 @@ DB.loggers << Logger.new($stdout)
 
 if User.empty?
   u = User.create(:email=>'jeremy', :password=>'123456')
-  u.add_application(:name=>'kaeruerr')
+  u.add_application(:name=>'kaeruera')
 end
 
