@@ -1,10 +1,12 @@
 require 'rest-client'
+require 'json'
 
 module KaeruEra
   class Reporter
-    def initialize(host, email, application, token)
-      @url = "http://#{host}/report_error"
-      @json = {:email=>email, :application=>application, :token=>token}.freeze
+    def initialize(url, application_id, token)
+      @url = url
+      @application_id = application_id
+      @token = token
     end
 
     # Opts:
@@ -15,11 +17,11 @@ module KaeruEra
     def report(opts={})
       return false unless error = opts[:error] || $!
 
-      h = @json.merge(
+      h = {
         :error_class=>error.class.name,
         :message=>error.message.to_s,
         :backtrace=>error.backtrace
-      )
+      }
 
       if v = opts[:params]
         h[:params] = v
@@ -31,8 +33,8 @@ module KaeruEra
         h[:env] = v
       end
 
-      RestClient.post @url, {:data=>h}, :content_type => :json, :accept => :json
-      true
+      res = RestClient.post @url, {:data=>h, :id=>@application_id, :token=>@token}.to_json, :content_type => :json, :accept => :json
+      JSON.parse(res)['error_id']
     end
   end
 end

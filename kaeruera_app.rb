@@ -2,6 +2,7 @@ require 'erb'
 require 'sinatra/base'
 require 'rack/csrf'
 require 'models'
+require 'json'
 require './lib/kaeruera/recorder'
 
 module KaeruEra
@@ -79,28 +80,29 @@ module KaeruEra
     end
 
     post '/report_error' do
-      data = params[:data]
-      app_id = Application.where(:token=>data[:token], :name=>data[:application], :user_id=>User.first!(:email=>data[:email].to_s).id).get(:id)
+      params = JSON.parse(request.body.read)
+      data = params['data']
+      app_id = Application.first!(:token=>params['token'].to_s, :id=>params['id'].to_i).id
 
       h = {
         :application_id=>app_id,
-        :error_class=>data[:error_class],
-        :message=>data[:message],
-        :backtrace=>Sequel.pg_array(data[:backtrace])
+        :error_class=>data['error_class'],
+        :message=>data['message'],
+        :backtrace=>Sequel.pg_array(data['backtrace'])
       }
 
-      if v = data[:params]
-        h[:params] = Sequel.pg_json(data[:params])
+      if v = data['params']
+        h[:params] = Sequel.pg_json(v)
       end
-      if v = data[:session]
-        h[:session] = Sequel.pg_json(data[:session])
+      if v = data['session']
+        h['session'] = Sequel.pg_json(v)
       end
-      if v = data[:env]
-        h[:env] = Sequel.hstore(data[:env])
+      if v = data['env']
+        h[:env] = Sequel.hstore(v)
       end
 
       error_id = DB[:errors].insert(h)
-      "{error_id: #{error_id}}"
+      "{\"error_id\": #{error_id}}"
     end
   end
 end
