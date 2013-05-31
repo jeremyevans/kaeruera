@@ -21,9 +21,6 @@ module KaeruEra
     before do
       unless %w'/application.css /favicon.ico /login /logout /report_error'.include?(env['PATH_INFO'])
         redirect('/login', 303) if !session[:user_id]
-        unless %w'/choose_application /add_application'.include?(env['PATH_INFO'])
-          redirect('/choose_application', 303) unless session[:application_id]
-        end
       end
     end
 
@@ -37,7 +34,7 @@ module KaeruEra
     post '/login' do
       if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
         session[:user_id] = i
-        redirect('/choose_application', 303)
+        redirect('/', 303)
       else
         redirect('/login', 303)
       end
@@ -55,7 +52,7 @@ module KaeruEra
       user = User.with_pk!(session[:user_id])
       user.password = params[:password].to_s
       user.save
-      redirect('/errors', 303)
+      redirect('/', 303)
     end
 
     get '/add_application' do
@@ -63,22 +60,16 @@ module KaeruEra
     end
     post '/add_application' do
       Application.create(:user_id=>session[:user_id], :name=>params[:name])
-      redirect('/errors', 303)
+      redirect('/', 303)
     end
 
-    get '/choose_application' do
+    get '/' do
       @apps = Application.where(:user_id=>session[:user_id]).order(:name).all
       erb :applications
     end
-    post '/choose_application' do
-      @app = Application.first!(:user_id=>session[:user_id], :id=>params[:id].to_i)
-      session[:application_id] = @app.id
-      session[:application_name] = @app.name
-      redirect('/errors', 303)
-    end
 
-    get '/errors' do
-      @errors = Error.where(:application_id=>session[:application_id]).most_recent(25).all
+    get '/applications/:application_id' do
+      @errors = Error.where(:application_id=>params[:application_id].to_i).most_recent(25).all
       erb :errors
     end
     get '/error/:id' do
@@ -88,7 +79,7 @@ module KaeruEra
 
     get '/search' do
       if search = params[:search]
-        @errors = Error.search(search.to_s).most_recent(25).all
+        @errors = Error.where(:application=>Application.where(:user_id=>session[:user_id])).search(search.to_s).most_recent(25).all
         erb :errors
       else
         erb :search

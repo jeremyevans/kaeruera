@@ -1,6 +1,9 @@
 <% @title = "Error #{@error.id}" %>
 
+<h2>Info</h2>
 <ul>
+  <li>User: <%=h @error.application.user.email %></li>
+  <li>Application: <%=h @error.application.name %></li>
   <li>Class: <%=h @error.error_class %></li>
   <li>Message: <%=h @error.message %></li>
   <li>Occured On: <%=h @error.created_at.strftime('%F %T') %></li>

@@ -12,16 +12,13 @@
 <div class="navbar">
   <div class="navbar-inner">
     <div class="container">
-      <a href="/errors" class="brand">KaeruEra<%=h ": #{session[:application_name]}" if session[:application_name] %></a>
+      <a href="/" class="brand">KaeruEra</a>
 
       <ul class="nav">
-        <% if session[:application_id] %>
-          <li><a href="/search">Search</a></li>
+        <li><a href="/search">Search</a></li>
 
-          <li class="divider-vertical"></li>
-          <li><a href="/choose_application">Change Application</a></li>
-          <li><a href="/change_password">Change Password</a></li>
-        <% end %>
+        <li class="divider-vertical"></li>
+        <li><a href="/change_password">Change Password</a></li>
       </ul>
       <% if session[:user_id] %>
         <form action="/logout" class="button_to" method="post">
