@@ -34,7 +34,6 @@ module KaeruEra
     get '/login' do
       render :erb, :login
     end
-    
     post '/login' do
       if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
         session[:user_id] = i
@@ -47,6 +46,16 @@ module KaeruEra
     post '/logout' do
       session.clear
       redirect '/login'
+    end
+
+    get '/change_password' do
+      erb :change_password
+    end
+    post '/change_password' do
+      user = User.with_pk!(session[:user_id])
+      user.password = params[:password].to_s
+      user.save
+      redirect('/errors', 303)
     end
 
     get '/choose_application' do
