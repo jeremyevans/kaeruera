@@ -1,4 +1,4 @@
-<% @title = 'Errors' %>
+<% @title = "Errors for #{@app.name}" %>
 
 <table class="table table-bordered table-striped">
 <thead>
@@ -21,3 +21,10 @@
 </tbody>
 </table>
 
+<% if @app %>
+  <h2>Recorder/Reporter Info</h2>
+  <ul>
+    <li>KaeruEra::Recorder.new('<%= @app.db.uri %>', '<%= @app.user.email %>', '<%=h @app.name %>')</li>
+    <li>KaeruEra::Reporter.new('http://<%=h env['HTTP_HOST'] %>/report_error', <%= @app.id %>, '<%=h @app.token %>')</li>
+  </ul>
+<% end %>

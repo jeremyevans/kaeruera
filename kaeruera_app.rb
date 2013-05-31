@@ -69,7 +69,8 @@ module KaeruEra
     end
 
     get '/applications/:application_id' do
-      @errors = Error.where(:application_id=>params[:application_id].to_i).most_recent(25).all
+      @app = Application.first!(:user_id=>session[:user_id], :id=>params[:application_id].to_i)
+      @errors = @app.app_errors_dataset.most_recent(25).all
       erb :errors
     end
     get '/error/:id' do
