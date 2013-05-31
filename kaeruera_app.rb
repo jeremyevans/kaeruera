@@ -7,7 +7,7 @@ require './lib/kaeruera/recorder'
 
 module KaeruEra
   class App < Sinatra::Base
-    KE = Recorder.new(DB.uri, 'kaeruera', 'kaeruera')
+    KE = Recorder.new(DB, 'kaeruera', 'kaeruera')
 
     set :environment, 'production'
     disable :run

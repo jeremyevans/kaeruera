@@ -5,7 +5,7 @@ Sequel.extension :pg_array, :pg_hstore, :pg_json, :pg_array_ops, :pg_hstore_ops
 module KaeruEra
   class Recorder
     def initialize(uri, email, application)
-      @db = Sequel.connect(uri, :keep_reference=>false)
+      @db = uri.is_a?(Sequel::Database) ? uri : Sequel.connect(uri, :keep_reference=>false)
       @db.extension :pg_array, :pg_hstore, :pg_json
       @application_id = @db[:applications].where(:user_id=>@db[:users].where(:email=>email).get(:id), :name=>application).get(:id)
     end
