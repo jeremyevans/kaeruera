@@ -28,7 +28,6 @@ module KaeruEra
     end
 
     error do
-      p :foo
       KE.record(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
     end
 
