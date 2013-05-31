@@ -11,7 +11,7 @@ module KaeruEra
 
     set :environment, 'production'
     disable :run
-    use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : SecureRandom.hex(20)
+    use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
     use Rack::Csrf, :skip => ['POST:/report_error']
 
     def h(text)
