@@ -23,7 +23,7 @@ require './models/error'
 DB.loggers << Logger.new($stdout)
 
 if User.empty?
-  u = User.create(:email=>'jeremy', :password=>'123456')
+  u = User.create(:email=>'kaeruera', :password=>'kaeruera')
   u.add_application(:name=>'kaeruera')
 end
 
