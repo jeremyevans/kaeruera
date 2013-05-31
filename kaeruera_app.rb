@@ -58,6 +58,14 @@ module KaeruEra
       redirect('/errors', 303)
     end
 
+    get '/add_application' do
+      erb :add_application
+    end
+    post '/add_application' do
+      Application.create(:user_id=>session[:user_id], :name=>params[:name])
+      redirect('/errors', 303)
+    end
+
     get '/choose_application' do
       @apps = Application.where(:user_id=>session[:user_id]).order(:name).all
       erb :applications

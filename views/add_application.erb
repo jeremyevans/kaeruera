@@ -1,0 +1,18 @@
+<% @title = 'Add Application' %>
+
+<form action="/add_application" class="form-horizontal" method="post">
+  <%= Rack::Csrf.tag(env) %>
+  <fieldset>
+    <div class="control-group">
+      <label class="control-label" for="email">New Password</label>
+      <div class="controls">
+        <input type="text" class="input-xlarge" name="name" id="name" placeholder="application name"/>
+      </div>
+    </div>
+    <div class="form-actions">
+      <input type="submit" class="btn-large" value="Add Application"/>
+    </div>
+  </fieldset>
+</form>
+
+
