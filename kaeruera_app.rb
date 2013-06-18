@@ -27,6 +27,14 @@ module KaeruEra
       Rack::Utils.escape(text)
     end
 
+    def user_apps
+      Application.with_user(session[:user_id])
+    end
+
+    def get_error
+      @error = Error.with_user(session[:user_id]).first!(:id=>params[:id].to_i)
+    end
+
     before do
       unless %w'/application.css /favicon.ico /login /logout /report_error'.include?(env['PATH_INFO'])
         redirect('/login', 303) if !session[:user_id]
@@ -74,7 +82,7 @@ module KaeruEra
     end
 
     get '/' do
-      @apps = Application.where(:user_id=>session[:user_id]).order(:name).all
+      @apps = user_apps.order(:name).all
       erb :applications
     end
 
@@ -84,8 +92,15 @@ module KaeruEra
       erb :errors
     end
     get '/error/:id' do
-      @error = Error.with_pk!(params[:id].to_i)
+      @error = get_error
       erb :error
+    end
+    post '/update_error/:id' do
+      @error = get_error
+      halt(403, erb("Error Not Open")) if @error.closed
+      @error.closed = true if params[:close] == '1'
+      @error.update(:notes=>params[:notes].to_s)
+      redirect("/error/#{@error.id}")
     end
 
     get '/search' do
@@ -93,7 +108,7 @@ module KaeruEra
         @errors = Error.search(params, session[:user_id]).most_recent(25).all
         erb :errors
       else
-        @apps = Application.where(:user_id=>session[:user_id]).order(:name).all
+        @apps = user_apps.order(:name).all
         erb :search
       end
     end

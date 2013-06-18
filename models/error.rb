@@ -3,7 +3,7 @@ class Error < Sequel::Model
 
   dataset_module do
     def search(params, user_id)
-      app_ds = Application.where(:user_id=>user_id).select(:id)
+      app_ds = Application.with_user(user_id).select(:id)
       app_ds = app_ds.where(:id=>params[:application].to_i) if params[:application] && !params[:application].empty?
       ds = where(:application_id=>app_ds)
       ds = ds.where(:error_class=>params[:class].to_s) if params[:class] && !params[:class].empty?
@@ -23,6 +23,9 @@ class Error < Sequel::Model
     end
     def most_recent(limit)
       reverse_order(:created_at).limit(limit)
+    end
+    def with_user(user_id)
+      where(:application_id=>Application.where(:user_id=>user_id).select(:id))
     end
   end
 

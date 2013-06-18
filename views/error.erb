@@ -10,6 +10,19 @@
   <li>Occured On: <%=h @error.created_at.strftime('%F %T') %></li>
 </ul>
 
+<% if @error.closed && @error.notes && !@error.notes.empty? %>
+  <h2>Error Notes</h2>
+  <p><%=h @error.notes %></p>
+<% else %>
+  <h2>Update Error</h2>
+  <% form(@error, {:action=>"/update_error/#{@error.id}", :method=>'post', :class=>'row'}, :wrapper=>nil) do |f| %>
+    <%= Rack::Csrf.tag(env) %>
+    <div class="span8"><%= f.input(:notes, :name=>:notes, :as=>:textarea, :cols=>80, :rows=>6) %></div>
+    <div class="span4"><%= f.input(:checkbox, :no_hidden=>true, :value=>'1', :name=>'close', :id=>'close', :label=>'Close Error?', :obj=>nil) %><br /><br />
+    <%= f.button(:class=>'btn btn-primary', :value=>'Update Error') %></div>
+  <% end %>
+<% end %>
+
 <h2>Backtrace</h2>
 <ol>
 <% @error.backtrace.each do |line| %>

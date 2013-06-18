@@ -15,6 +15,7 @@ Sequel::Model.plugin :auto_validations
 Sequel::Model.plugin :prepared_statements
 Sequel::Model.plugin :prepared_statements_associations
 Sequel::Model.plugin :many_to_one_pk_lookup
+Sequel::Model.plugin :forme
 
 require './models/user'
 require './models/application'
