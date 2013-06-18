@@ -17,3 +17,5 @@ table caption {
   font-size: 24px;
   padding: 5px;
 }
+label { display: inline; margin-right: 5px; }
+input, textarea, select { width: auto; }
