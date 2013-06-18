@@ -1,5 +1,5 @@
 Sequel.migration do
-  up do
+  change do
     create_table(:users) do
       primary_key :id
       String :email, :null=>false, :unique=>true
@@ -16,30 +16,19 @@ Sequel.migration do
 
     create_table(:errors) do
       primary_key :id
-      foreign_key :application_id, :applications, :null=>false
-      Time :created_at, :null=>false, :default=>Sequel::CURRENT_TIMESTAMP
-      TrueClass :closed, :default=>false
-      String :error_class, :null=>false
-      String :message, :null=>false
-      column :backtrace , 'text[]', :null=>false
-      hstore :env 
+      foreign_key :application_id, :applications, :null=>false, :index=>true
+      Time :created_at, :null=>false, :default=>Sequel::CURRENT_TIMESTAMP, :index=>true
+      TrueClass :closed, :default=>false, :index=>true
+      String :error_class, :null=>false, :index=>true
+      String :message, :null=>false, :index=>{:type=>:full_text, :index_type=>:gist}
+      column :backtrace , 'text[]', :null=>false, :index=>{:type=>:gin}
+      hstore :env, :index=>{:type=>:gist}
       json :params
       json :session
-      String :search_text
+      String :notes
 
-      full_text_index :search_text
+      full_text_index Sequel.cast(:params, String), :index_type=>:gist, :name=>:errors_params_index
+      full_text_index Sequel.cast(:session, String), :index_type=>:gist, :name=>:errors_session_index
     end
-    create_function(:populate_search_text, <<-SQL, :returns=>:trigger, :language=>:plpgsql)
-      BEGIN
-        NEW.search_text = #{DB.literal Sequel.join([:error_class, :message, :backtrace, :env, :params, :session].map{|c| Sequel.function(:coalesce, Sequel.cast(Sequel.qualify(Sequel.lit('NEW'), c), String), '')}, ' ')};
-        RETURN NEW;
-      END;
-    SQL
-
-    create_trigger(:errors, :populate_search_text, :populate_search_text, :events=>[:insert, :update], :each_row=>true)
-  end
-  down do
-    drop_function(:populate_search_text)
-    drop_table(:errors, :applications, :users)
   end
 end

@@ -3,7 +3,11 @@ require 'sinatra/base'
 require 'rack/csrf'
 require 'models'
 require 'json'
+require 'forme/sinatra'
 require './lib/kaeruera/recorder'
+
+Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa)
+Forme.default_config = :mine
 
 module KaeruEra
   class App < Sinatra::Base
@@ -13,9 +17,14 @@ module KaeruEra
     disable :run
     use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
     use Rack::Csrf, :skip => ['POST:/report_error']
+    helpers Forme::Sinatra::ERB
 
     def h(text)
       Rack::Utils.escape_html(text)
+    end
+
+    def url_escape(text)
+      Rack::Utils.escape(text)
     end
 
     before do
@@ -80,9 +89,10 @@ module KaeruEra
 
     get '/search' do
       if search = params[:search]
-        @errors = Error.where(:application=>Application.where(:user_id=>session[:user_id])).search(search.to_s).most_recent(25).all
+        @errors = Error.search(params, session[:user_id]).most_recent(25).all
         erb :errors
       else
+        @apps = Application.where(:user_id=>session[:user_id]).order(:name).all
         erb :search
       end
     end

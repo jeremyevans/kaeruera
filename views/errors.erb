@@ -1,4 +1,4 @@
-<% @title = "Errors for #{@app.name}" %>
+<% @title = "Errors #{"for #{@app.name}" if @app}" %>
 
 <table class="table table-bordered table-striped">
 <thead>
@@ -6,6 +6,7 @@
     <th>ID</th>
     <th>Error Class</th>
     <th>Message</th>
+    <th>Status</th>
     <th>Occurred On</th>
   </tr>
 </thead>
@@ -15,6 +16,7 @@
     <td><a href="/error/<%= error.id %>"><%= error.id %></a></td>
     <td><%=h error.error_class %></td>
     <td><%=h error.message %></td>
+    <td><%=h error.status %></td>
     <td><%=h error.created_at.strftime('%F %T') %></td>
   </tr>
 <% end %>

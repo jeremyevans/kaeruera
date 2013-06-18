@@ -6,13 +6,14 @@
   <li>Application: <%=h @error.application.name %></li>
   <li>Class: <%=h @error.error_class %></li>
   <li>Message: <%=h @error.message %></li>
+  <li>Status: <%=h @error.status %></li>
   <li>Occured On: <%=h @error.created_at.strftime('%F %T') %></li>
 </ul>
 
 <h2>Backtrace</h2>
 <ol>
 <% @error.backtrace.each do |line| %>
-  <li><%=h line %></li>
+  <li><a href="/search?search=Search&amp;backtrace=<%=h url_escape(line)%>"><%=h line %></a></li>
 <% end %>
 </ol>
 
