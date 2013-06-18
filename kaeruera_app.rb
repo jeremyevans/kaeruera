@@ -6,7 +6,7 @@ require 'json'
 require 'forme/sinatra'
 require './lib/kaeruera/recorder'
 
-Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa)
+Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
 Forme.default_config = :mine
 
 module KaeruEra
