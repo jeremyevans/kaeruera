@@ -35,6 +35,7 @@ module KaeruEra
 
     error do
       KE.record(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
+      erb("Sorry, an error occurred")
     end
 
     get '/login' do
