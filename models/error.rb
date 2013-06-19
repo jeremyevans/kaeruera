@@ -21,8 +21,8 @@ class Error < Sequel::Model
       ds = ds.full_text_search(Sequel.cast(:session, String), params[:session].to_s) if params[:session] && !params[:session].empty?
       ds
     end
-    def most_recent(limit)
-      reverse_order(:created_at).limit(limit)
+    def most_recent
+      reverse_order(:created_at)
     end
     def with_user(user_id)
       where(:application_id=>Application.where(:user_id=>user_id).select(:id))

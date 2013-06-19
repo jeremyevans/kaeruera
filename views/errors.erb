@@ -23,7 +23,10 @@
 </tbody>
 </table>
 
-<% if @app %>
+<%= previous_page %>
+<%= next_page %>
+
+<% if @app && @page == 1 %>
   <h2>Recorder/Reporter Info</h2>
   <ul>
     <li>KaeruEra::Recorder.new('<%= @app.db.uri %>', '<%= @app.user.email %>', '<%=h @app.name %>')</li>
