@@ -1,0 +1,3 @@
+<% @title = "Reporter Info for #{@app.name}" %>
+
+<pre>KaeruEra::Reporter.new(&quot;http://<%=h env['HTTP_HOST'] %>/report_error&quot;, <%= @app.id %>, &quot;<%=h @app.token %>&quot;)</pre>

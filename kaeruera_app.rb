@@ -32,6 +32,10 @@ module KaeruEra
       Application.with_user(session[:user_id])
     end
 
+    def get_application
+      @app = Application.first!(:user_id=>session[:user_id], :id=>params[:application_id].to_i)
+    end
+
     def get_error
       @error = Error.with_user(session[:user_id]).first!(:id=>params[:id].to_i)
     end
@@ -125,8 +129,12 @@ module KaeruEra
       erb :applications
     end
 
+    get '/applications/:application_id/reporter_info' do
+      get_application
+      erb :reporter_info
+    end
     get '/applications/:application_id' do
-      @app = Application.first!(:user_id=>session[:user_id], :id=>params[:application_id].to_i)
+      get_application
       @errors = paginator(@app.app_errors_dataset.most_recent)
       erb :errors
     end
