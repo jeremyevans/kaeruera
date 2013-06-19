@@ -3,9 +3,9 @@
 <h2>Info</h2>
 <ul>
   <li>User: <%=h @error.application.user.email %></li>
-  <li>Application: <%=h @error.application.name %></li>
-  <li>Class: <%=h @error.error_class %></li>
-  <li>Message: <%=h @error.message %></li>
+  <li>Application: <a href="/applications/<%= @error.application_id %>"><%=h @error.application.name %></a></li>
+  <li>Class: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;class=<%=h url_escape(@error.error_class)%>"><%=h @error.error_class %></a></li>
+  <li>Message: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;message=<%=h url_escape(@error.message)%>"><%=h @error.message %></a></li>
   <li>Status: <%=h @error.status %></li>
   <li>Occured On: <%=h @error.created_at.strftime('%F %T') %></li>
 </ul>
@@ -26,7 +26,7 @@
 <h2>Backtrace</h2>
 <ol>
 <% @error.backtrace.each do |line| %>
-  <li><a href="/search?search=Search&amp;backtrace=<%=h url_escape(line)%>"><%=h line %></a></li>
+  <li><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;backtrace=<%=h url_escape(line)%>"><%=h line %></a></li>
 <% end %>
 </ol>
 
@@ -43,8 +43,13 @@
   <tbody>
     <% h.each do |k, v| %>
       <tr>
-        <td class="key"><%=h k %></td>
-        <td class="value"><%=h v %></td>
+        <% if type == :env %>
+          <td class="key"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%=h url_escape(k)%>"><%=h k %></a></td>
+          <td class="value"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%=h url_escape(k)%>&amp;env_value=<%=h url_escape(v)%>"><%=h v %></a></td>
+        <% else %>
+          <td class="key"><%=h k %></td>
+          <td class="value"><%=h v %></td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>
