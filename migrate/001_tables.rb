@@ -20,7 +20,7 @@ Sequel.migration do
       Time :created_at, :null=>false, :default=>Sequel::CURRENT_TIMESTAMP, :index=>true
       TrueClass :closed, :default=>false, :index=>true
       String :error_class, :null=>false, :index=>true
-      String :message, :null=>false, :index=>{:type=>:full_text, :index_type=>:gist}
+      String :message, :null=>false, :index=>true
       column :backtrace , 'text[]', :null=>false, :index=>{:type=>:gin}
       hstore :env, :index=>{:type=>:gist}
       json :params

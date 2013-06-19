@@ -7,7 +7,7 @@ class Error < Sequel::Model
       app_ds = app_ds.where(:id=>params[:application].to_i) if params[:application] && !params[:application].empty?
       ds = where(:application_id=>app_ds)
       ds = ds.where(:error_class=>params[:class].to_s) if params[:class] && !params[:class].empty?
-      ds = ds.full_text_search(:message, params[:message].to_s) if params[:message] && !params[:message].empty?
+      ds = ds.where(:message=>params[:message].to_s) if params[:message] && !params[:message].empty?
       ds = ds.where(:closed=>params[:closed] == '1') if params[:closed] && !params[:closed].empty?
       ds = ds.where(Sequel.pg_array(:backtrace).contains([params[:backtrace].to_s])) if params[:backtrace] && !params[:backtrace].empty?
       if params[:env_key] && !params[:env_key].empty?
