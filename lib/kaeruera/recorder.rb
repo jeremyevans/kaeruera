@@ -37,6 +37,8 @@ module KaeruEra
 
       @db[:errors].insert(h)
       true
+    rescue => e
+      e
     end
   end
 end

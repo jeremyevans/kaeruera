@@ -35,6 +35,8 @@ module KaeruEra
 
       res = RestClient.post @url, {:data=>h, :id=>@application_id, :token=>@token}.to_json, :content_type => :json, :accept => :json
       JSON.parse(res)['error_id']
+    rescue => e
+      e
     end
   end
 end
