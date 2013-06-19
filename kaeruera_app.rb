@@ -4,6 +4,7 @@ require 'rack/csrf'
 require 'models'
 require 'json'
 require 'forme/sinatra'
+require 'sinatra/flash'
 require './lib/kaeruera/recorder'
 
 Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
@@ -18,6 +19,7 @@ module KaeruEra
     disable :run
     use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
     use Rack::Csrf, :skip => ['POST:/report_error']
+    register Sinatra::Flash
     helpers Forme::Sinatra::ERB
 
     def h(text)
@@ -41,6 +43,7 @@ module KaeruEra
     end
 
     def paginator(dataset, per_page=PER_PAGE)
+      return dataset.all if params[:all] == '1'
       page = (params[:page] || 1).to_i
       page = 1 if page < 1
       @previous_page = true if page > 1
@@ -95,14 +98,17 @@ module KaeruEra
     post '/login' do
       if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
         session[:user_id] = i
+        flash[:notice] = "Logged In"
         redirect('/', 303)
       else
+        flash[:error] = "No matching email/password"
         redirect('/login', 303)
       end
     end
     
     post '/logout' do
       session.clear
+      flash[:notice] = "Logged Out"
       redirect '/login'
     end
 
@@ -113,6 +119,7 @@ module KaeruEra
       user = User.with_pk!(session[:user_id])
       user.password = params[:password].to_s
       user.save
+      flash[:notice] = "Password Changed"
       redirect('/', 303)
     end
 
@@ -121,6 +128,7 @@ module KaeruEra
     end
     post '/add_application' do
       Application.create(:user_id=>session[:user_id], :name=>params[:name])
+      flash[:notice] = "Application Added"
       redirect('/', 303)
     end
 
@@ -135,7 +143,7 @@ module KaeruEra
     end
     get '/applications/:application_id' do
       get_application
-      @errors = paginator(@app.app_errors_dataset.most_recent)
+      @errors = paginator(@app.app_errors_dataset.open.most_recent)
       erb :errors
     end
     get '/error/:id' do
@@ -147,7 +155,18 @@ module KaeruEra
       halt(403, erb("Error Not Open")) if @error.closed
       @error.closed = true if params[:close] == '1'
       @error.update(:notes=>params[:notes].to_s)
+      flash[:notice] = "Error Updated"
       redirect("/error/#{@error.id}")
+    end
+    post '/update_multiple_errors' do
+      h = {:notes=>params[:notes].to_s}
+      h[:closed] = true if params[:close] == '1'
+      n = Error.
+        with_user(session[:user_id]).
+        where(:id=>params[:ids].to_a.map{|x| x.to_i}, :closed=>false).
+        update(h)
+      flash[:notice] = "Updated #{n} errors"
+      redirect("/")
     end
 
     get '/search' do

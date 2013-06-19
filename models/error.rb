@@ -24,6 +24,9 @@ class Error < Sequel::Model
     def most_recent
       reverse_order(:created_at)
     end
+    def open 
+      where(:closed=>false)
+    end
     def with_user(user_id)
       where(:application_id=>Application.where(:user_id=>user_id).select(:id))
     end

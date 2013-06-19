@@ -31,8 +31,14 @@
 </div>
 
 <div class="container" id="content">
-<%= "<h1>#{@title}</h1>" if @title %>
-<%= yield %>
+  <% if flash[:notice] %>
+    <div class="alert alert-success"><p><%=h flash[:notice] %></p></div>
+  <% end %>
+  <% if flash[:error] %>
+    <div class="alert alert-error"><p><%=h flash[:error] %></p></div>
+  <% end %>
+  <%= "<h1>#{@title}</h1>" if @title %>
+  <%= yield %>
 </div>
 
 </body></html>
