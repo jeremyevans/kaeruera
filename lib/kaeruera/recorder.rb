@@ -1,13 +1,13 @@
 require 'sequel'
 
-Sequel.extension :pg_array, :pg_hstore, :pg_json, :pg_array_ops, :pg_hstore_ops
-
 module KaeruEra
   class Recorder
+    class Error < StandardError; end
+
     def initialize(uri, email, application)
       @db = uri.is_a?(Sequel::Database) ? uri : Sequel.connect(uri, :keep_reference=>false)
       @db.extension :pg_array, :pg_hstore, :pg_json
-      @application_id = @db[:applications].where(:user_id=>@db[:users].where(:email=>email).get(:id), :name=>application).get(:id)
+      raise(Error, "No matching application in database for #{email}/#{application}") unless @application_id = @db[:applications].where(:user_id=>@db[:users].where(:email=>email).get(:id), :name=>application).get(:id)
     end
 
     # Opts:
@@ -36,7 +36,6 @@ module KaeruEra
       end
 
       @db[:errors].insert(h)
-      true
     rescue => e
       e
     end
