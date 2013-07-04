@@ -21,10 +21,11 @@ require './models/user'
 require './models/application'
 require './models/error'
 
-DB.loggers << Logger.new($stdout)
+if ENV['RACK_ENV'] == 'development'
+  DB.loggers << Logger.new($stdout)
 
-if User.empty?
-  u = User.create(:email=>'kaeruera', :password=>'kaeruera')
-  u.add_application(:name=>'kaeruera')
+  if User.empty?
+    u = User.create(:email=>'kaeruera', :password=>'kaeruera')
+    u.add_application(:name=>'KaeruEraApp')
+  end
 end
-

@@ -12,7 +12,7 @@ Forme.default_config = :mine
 
 module KaeruEra
   class App < Sinatra::Base
-    KE = Recorder.new(DB, 'kaeruera', 'kaeruera')
+    RECORDER = (Recorder.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
     PER_PAGE = 25
 
     set :environment, 'production'
@@ -89,7 +89,9 @@ module KaeruEra
     end
 
     error do
-      KE.record(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
+      if RECORDER
+        RECORDER.record(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
+      end
       erb("Sorry, an error occurred")
     end
 
