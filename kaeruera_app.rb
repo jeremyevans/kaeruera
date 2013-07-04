@@ -141,7 +141,7 @@ module KaeruEra
       get_application
       erb :reporter_info
     end
-    get '/applications/:application_id' do
+    get '/applications/:application_id/errors' do
       get_application
       @errors = paginator(@app.app_errors_dataset.open.most_recent)
       erb :errors

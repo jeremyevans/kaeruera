@@ -3,7 +3,7 @@
 <h2>Info</h2>
 <ul>
   <li>User: <%=h @error.application.user.email %></li>
-  <li>Application: <a href="/applications/<%= @error.application_id %>"><%=h @error.application.name %></a></li>
+  <li>Application: <a href="/applications/<%= @error.application_id %>/errors"><%=h @error.application.name %></a></li>
   <li>Class: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;class=<%=h url_escape(@error.error_class)%>"><%=h @error.error_class %></a></li>
   <li>Message: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;message=<%=h url_escape(@error.message)%>"><%=h @error.message %></a></li>
   <li>Status: <%=h @error.status %></li>

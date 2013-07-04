@@ -35,7 +35,7 @@
 
   <% if @next_page || @previous_page %>
     <% if @app %>
-      <h2><a href="/applications/<%= @app.id %>?all=1">Show All Open Errors</a></h2>
+      <h2><a href="/applications/<%= @app.id %>/errors?all=1">Show All Open Errors</a></h2>
     <% else %>
       <h2><a href="/search?<%=h env['QUERY_STRING'] %>&amp;all=1">Show All Errors in this Search</a></h2>
     <% end %>
