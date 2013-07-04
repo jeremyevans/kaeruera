@@ -12,5 +12,6 @@ class Application < Sequel::Model
     unless values.has_key?(:token)
       self.token = SecureRandom.hex(20)
     end
+    super
   end
 end
