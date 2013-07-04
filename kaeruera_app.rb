@@ -48,7 +48,8 @@ module KaeruEra
       page = 1 if page < 1
       @previous_page = true if page > 1
       @page = page
-      values = dataset.limit(per_page+1, (page - 1) * per_page).all
+      offset = (page - 1) * per_page
+      values = dataset.limit(per_page+1, offset > 0 ? offset : nil).all
       if values.length == per_page+1
         values.pop
         @next_page = true
