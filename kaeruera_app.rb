@@ -13,8 +13,16 @@ Forme.default_config = :mine
 
 module KaeruEra
   class App < Sinatra::Base
+    # The reporter used for reporting internal errors.  Defaults to the same database
+    # used to store the errors for the applications that this server tracks.  This
+    # causes obvious issues if the Database for this server goes down.
     REPORTER = (DatabaseReporter.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
+
+    # The number of errors to show per page on the application and search result pages.
+    # Currently hardcoded, but will probably be made user specific at some point.
     PER_PAGE = 25
+
+    # Whether demo is on.  In demo mode, passwords cannot be changed.
     if ENV['DEMO_MODE'] == '1'
       DEMO_MODE = true
     else
@@ -36,18 +44,26 @@ module KaeruEra
       Rack::Utils.escape(text)
     end
 
+    # Returns a dataset of all applications for the logged in user.
     def user_apps
       Application.with_user(session[:user_id])
     end
 
+    # Returns the application with the given id for the logged in user.
     def get_application
       @app = Application.first!(:user_id=>session[:user_id], :id=>params[:application_id].to_i)
     end
 
+    # Returns the application with the given id for the logged in user.
     def get_error
       @error = Error.with_user(session[:user_id]).first!(:id=>params[:id].to_i)
     end
 
+    # Does a simple pagination of the results of the dataset.  This
+    # increases the per page limit by one, and if that number of rows
+    # are returned, it is obvious that there is another page.  This is
+    # faster than a normal paginator, which requires a count of matching
+    # rows, but doesn't allow for jumping more than one page forward at a time.
     def paginator(dataset, per_page=PER_PAGE)
       return dataset.all if params[:all] == '1'
       page = (params[:page] || 1).to_i
@@ -62,6 +78,9 @@ module KaeruEra
       end
       values
     end
+
+    # Return a path to a different page in the same paginated
+    # result set.
     def modify_page(i)
       query = env['QUERY_STRING']
       found_page = false
@@ -79,21 +98,31 @@ module KaeruEra
 
       "#{env['PATH_INFO']}?#{query}"
     end
+
+    # Return an html fragment for the Previous Page button, if this
+    # isn't the first page.
     def previous_page
       return unless @previous_page
       "<a class='btn' href=\"#{modify_page(-1)}\">Previous Page</a>"
     end
+
+    # Return a html fragment for the Next Page button, if there is a
+    # another page.
     def next_page
       return unless @next_page
       "<a class='btn' href=\"#{modify_page(1)}\">Next Page</a>"
     end
 
+    # Force users to login before using the site, except for error
+    # reporting (which uses the application's token).
     before do
       unless %w'/application.css /favicon.ico /login /logout /report_error'.include?(env['PATH_INFO'])
         redirect('/login', 303) if !session[:user_id]
       end
     end
 
+    # If an internal error occurs, record it so that the application
+    # can track its own errors.
     error do
       if REPORTER
         REPORTER.report(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
@@ -104,6 +133,7 @@ module KaeruEra
     get '/login' do
       render :erb, :login
     end
+
     post '/login' do
       if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
         session[:user_id] = i
@@ -125,6 +155,7 @@ module KaeruEra
       get '/change_password' do
         erb :change_password
       end
+
       post '/change_password' do
         user = User.with_pk!(session[:user_id])
         user.password = params[:password].to_s
@@ -137,6 +168,7 @@ module KaeruEra
     get '/add_application' do
       erb :add_application
     end
+
     post '/add_application' do
       Application.create(:user_id=>session[:user_id], :name=>params[:name])
       flash[:notice] = "Application Added"
@@ -152,15 +184,18 @@ module KaeruEra
       get_application
       erb :reporter_info
     end
+
     get '/applications/:application_id/errors' do
       get_application
       @errors = paginator(@app.app_errors_dataset.open.most_recent)
       erb :errors
     end
+
     get '/error/:id' do
       @error = get_error
       erb :error
     end
+
     post '/update_error/:id' do
       @error = get_error
       halt(403, erb("Error Not Open")) if @error.closed
@@ -169,6 +204,7 @@ module KaeruEra
       flash[:notice] = "Error Updated"
       redirect("/error/#{@error.id}")
     end
+
     post '/update_multiple_errors' do
       h = {:notes=>params[:notes].to_s}
       h[:closed] = true if params[:close] == '1'
