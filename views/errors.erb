@@ -2,9 +2,9 @@
 
 <% if @errors.empty? %>
   <% if @app %>
-    <h2>No errors reported for <%=h @app.name %></h2>
+    <h2>No open errors for <%=h @app.name %></h2>
   <% else %>
-    <h2>No errors matching your search</h2>
+    <h2>No errors matching your search criteria</h2>
   <% end %>
 <% else %>
   <table class="table table-bordered table-striped">
