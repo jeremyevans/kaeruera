@@ -115,6 +115,18 @@ describe Error do
     Error.search({:session=>'foo'}, user_id).all.should == []
   end
 
+  it ".search should search by time occurred" do
+    today = Date.today.to_s
+    tomorrow = (Date.today+1).to_s
+    Error.search({:occurred_after=>today}, user_id).all.should == Error.all
+    Error.search({:occurred_after=>tomorrow}, user_id).all.should == []
+    Error.search({:occurred_before=>tomorrow}, user_id).all.should == Error.all
+    Error.search({:occurred_before=>today}, user_id).all.should == []
+    Error.search({:occurred_after=>today, :occurred_before=>tomorrow}, user_id).all.should == Error.all
+    Error.search({:occurred_after=>today, :occurred_before=>today}, user_id).all.should == []
+    Error.search({:occurred_after=>tomorrow, :occurred_before=>today}, user_id).all.should == []
+  end
+
   it ".most_recent should most recent errors" do
     Error.most_recent.first.should == Error.first
     raise 'foo' rescue (Application.first.add_app_error(:error_class=>$!.class, :message=>$!.message, :backtrace=>Sequel.pg_array($!.backtrace)))

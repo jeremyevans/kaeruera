@@ -109,7 +109,7 @@ describe KaeruEra do
     info[2].should == 'Class: RuntimeError'
     info[3].should =~ /\AMessage:.+foo/
     info[4].should == 'Status: Open'
-    info[5].should =~ /\AOccured On: #{Date.today}/
+    info[5].should =~ /\AOccured On:\s+#{Date.today.strftime('%Y\\s+-\\s+%m\\s+-\\s+%d')}/
 
     bt = all("#content ol li").map{|s| s.text}
     bt[0].should =~ /spec\/web_spec.rb/
@@ -133,9 +133,11 @@ describe KaeruEra do
     page.html.should =~ /Error Search Results/
     click_link error_id
 
-    all("#content ul li a")[2].click
-    page.html.should =~ /Error Search Results/
-    click_link error_id
+    (2..8).each do |i|
+      all("#content ul li a")[i].click
+      page.html.should =~ /Error Search Results/
+      click_link error_id
+    end
 
     all("#content ol li a")[0].click
     page.html.should =~ /Error Search Results/
@@ -202,6 +204,16 @@ describe KaeruEra do
 
     click_link 'Search'
     fill_in 'Session Contains', :with=>'papaya'
+    click_button 'Search'
+    all('#content tr').size.should == 2
+
+    click_link 'Search'
+    fill_in 'Occurred On or After', :with=>Date.today
+    click_button 'Search'
+    all('#content tr').size.should == 2
+
+    click_link 'Search'
+    fill_in 'Occurred Before', :with=>Date.today+1
     click_button 'Search'
     all('#content tr').size.should == 2
   end

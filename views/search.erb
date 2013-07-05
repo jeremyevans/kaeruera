@@ -10,5 +10,7 @@
   <%= f.input(:text, :name=>'env_value', :id=>'env_value', :label=>'With Value') %>
   <%= f.input(:text, :name=>'params', :id=>'params', :label=>'Params Contains') %>
   <%= f.input(:text, :name=>'session', :id=>'session', :label=>'Session Contains') %>
+  <%= f.input(:text, :name=>'occurred_after', :id=>'occurred_after', :label=>'Occurred On or After') %>
+  <%= f.input(:text, :name=>'occurred_before', :id=>'occurred_before', :label=>'Occurred Before') %>
   <%= f.button(:class=>'btn btn-primary', :name=>'search', :value=>'Search') %>
 <% end %>

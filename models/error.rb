@@ -19,6 +19,8 @@ class Error < Sequel::Model
       end
       ds = ds.full_text_search(Sequel.cast(:params, String), params[:params].to_s) if params[:params] && !params[:params].empty?
       ds = ds.full_text_search(Sequel.cast(:session, String), params[:session].to_s) if params[:session] && !params[:session].empty?
+      ds = ds.where{created_at >= params[:occurred_after].to_s} if params[:occurred_after] && !params[:occurred_after].empty?
+      ds = ds.where{created_at < params[:occurred_before].to_s} if params[:occurred_before] && !params[:occurred_before].empty?
       ds
     end
     def most_recent
