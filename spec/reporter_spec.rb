@@ -1,7 +1,9 @@
 ENV['RACK_ENV'] = 'test'
 $: << File.dirname(File.dirname(__FILE__))
+$: << File.join(File.dirname(File.dirname(__FILE__)), 'lib')
 require 'db'
-require 'lib/kaeruera/reporter'
+require 'kaeruera/reporter'
+require 'kaeruera/async_reporter'
 require 'spec/shared_lib_spec'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
@@ -12,6 +14,27 @@ DB.extension :pg_array, :pg_hstore, :pg_json
 describe KaeruEra::Reporter do
   before(:all) do
     @reporter = KaeruEra::Reporter.new('http://127.0.0.1:25778/report_error', application_id, '1')
+    @application_id = application_id
+  end
+  before do
+    DB[:errors].delete
+  end
+
+  it_should_behave_like "kaeruera libs"
+end
+
+describe KaeruEra::AsyncReporter do
+  before(:all) do
+    @reporter = KaeruEra::AsyncReporter.new('http://127.0.0.1:25778/report_error', application_id, '1')
+    def @reporter.report(opts={})
+      if (r = super) == true
+        sleep 0.3
+        DB[:errors].max(:id)
+      else
+        r
+      end
+    end
+    @skip_exception_test = true
     @application_id = application_id
   end
   before do
