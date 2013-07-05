@@ -5,7 +5,8 @@ require 'models'
 require 'json'
 require 'forme/sinatra'
 require 'sinatra/flash'
-require './lib/kaeruera/database_reporter'
+$: << './lib'
+require 'kaeruera/database_reporter'
 
 Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
 Forme.default_config = :mine
