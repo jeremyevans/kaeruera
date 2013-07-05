@@ -1,15 +1,18 @@
-require 'sequel'
 require 'bcrypt'
 require 'securerandom'
 require 'logger'
 
-Sequel.extension :pg_array, :pg_hstore, :pg_json, :pg_array_ops, :pg_hstore_ops
+if ENV['RACK_ENV'] == 'test'
+  BCRYPT_COST = BCrypt::Engine::MIN_COST
+else
+  BCRYPT_COST = BCrypt::Engine::DEFAULT_COST
+end
 
-DB = Sequel.connect(ENV['DATABASE_URL'] || 'postgres:///?user=kaeruera')
+require File.join(File.dirname(__FILE__), 'db')
 
 DB.extension :pg_array, :pg_hstore, :pg_json
+Sequel.extension :pg_array_ops, :pg_hstore_ops
 
-BCRYPT_COST = BCrypt::Engine::MIN_COST
 Sequel::Model.raise_on_typecast_failure = false
 Sequel::Model.plugin :auto_validations
 Sequel::Model.plugin :prepared_statements

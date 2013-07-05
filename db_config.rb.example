@@ -1,0 +1,8 @@
+case ENV['RACK_ENV']
+when 'test'
+  DB = Sequel.connect(ENV['DATABASE_URL'] || "postgres:///kaeruera_test?user=kaeruera")
+when 'production'
+  DB = Sequel.connect(ENV['DATABASE_URL'] || "postgres:///kaeruera_production?user=kaeruera")
+else
+  DB = Sequel.connect(ENV['DATABASE_URL'] || "postgres:///kaeruera_development?user=kaeruera")
+end
