@@ -10,10 +10,6 @@ application_id = DB[:applications].insert(:user_id=>user_id, :name=>'app', :toke
 DB.extension :pg_array, :pg_hstore, :pg_json
 
 describe KaeruEra::Reporter do
-  def record(*a)
-    @reporter.report(*a)
-  end
-
   before(:all) do
     @reporter = KaeruEra::Reporter.new('http://127.0.0.1:25778/report_error', application_id, '1')
     @application_id = application_id

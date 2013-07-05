@@ -1,7 +1,7 @@
 require 'sequel'
 
 module KaeruEra
-  class Recorder
+  class DatabaseReporter
     class Error < StandardError; end
 
     def initialize(uri, email, application)
@@ -15,7 +15,7 @@ module KaeruEra
     # :params
     # :session
     # :env
-    def record(opts={})
+    def report(opts={})
       return false unless error = opts[:error] || $!
 
       h = {

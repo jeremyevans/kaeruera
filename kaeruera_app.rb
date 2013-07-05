@@ -5,14 +5,14 @@ require 'models'
 require 'json'
 require 'forme/sinatra'
 require 'sinatra/flash'
-require './lib/kaeruera/recorder'
+require './lib/kaeruera/database_reporter'
 
 Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
 Forme.default_config = :mine
 
 module KaeruEra
   class App < Sinatra::Base
-    RECORDER = (Recorder.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
+    REPORTER = (DatabaseRecorder.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
     PER_PAGE = 25
 
     set :environment, 'production'
@@ -89,8 +89,8 @@ module KaeruEra
     end
 
     error do
-      if RECORDER
-        RECORDER.record(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
+      if REPORTER
+        REPORTER.report(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
       end
       erb("Sorry, an error occurred")
     end

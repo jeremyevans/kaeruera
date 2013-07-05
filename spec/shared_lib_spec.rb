@@ -1,4 +1,8 @@
 shared_examples_for "kaeruera libs" do
+  def record(*a)
+    @reporter.report(*a)
+  end
+
   it "should insert current error into database" do
     raise 'foo' rescue (e = $!; (record))
     DB[:errors].first.values_at(:application_id, :error_class, :message, :backtrace).should == [@application_id, e.class.name, e.message, e.backtrace]

@@ -3,16 +3,16 @@ require "spec/rake/spectask"
 
 # Specs
 
-task :default=>[:model_spec, :recorder_spec, :reporter_spec, :web_spec]
+task :default=>[:database_reporter_spec, :reporter_spec, :model_spec, :web_spec]
 
 desc "Run model specs"
 Spec::Rake::SpecTask.new("model_spec") do |t|
   t.spec_files = ["spec/model_spec.rb"]
 end
 
-desc "Run recorder specs"
-Spec::Rake::SpecTask.new("recorder_spec") do |t|
-  t.spec_files = ["spec/recorder_spec.rb"]
+desc "Run database_reporter specs"
+Spec::Rake::SpecTask.new("database_reporter_spec") do |t|
+  t.spec_files = ["spec/database_reporter_spec.rb"]
 end
 
 desc "Run reporter specs"
