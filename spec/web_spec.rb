@@ -77,6 +77,18 @@ describe KaeruEra do
     page.current_path.should == '/login'
   end
 
+  it "should report internal errors" do
+    visit('/applications/0/errors')
+    click_link 'KaeruEra'
+    click_link 'KaeruEraApp'
+    cells = all('td').map{|s| s.text}
+    cells[0].should =~ /\d+/
+    cells[1].should == 'Sequel::NoMatchingRow'
+    cells[2].should == 'Sequel::NoMatchingRow' 
+    cells[3].should == 'Open'
+    cells[4].should =~ /\A#{Date.today}/
+  end
+
   it "should allow viewing most recent errors for application" do
     click_link 'KaeruEraApp'
     cells = all('td').map{|s| s.text}

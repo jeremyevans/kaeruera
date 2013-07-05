@@ -13,7 +13,7 @@ Forme.default_config = :mine
 
 module KaeruEra
   class App < Sinatra::Base
-    REPORTER = (DatabaseRecorder.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
+    REPORTER = (DatabaseReporter.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
     PER_PAGE = 25
 
     set :environment, 'production'
