@@ -8,9 +8,8 @@ class Error < Sequel::Model
     # to the given user, and further restricts it based on the the hash
     # of params.
     def search(params, user_id)
-      app_ds = Application.with_user(user_id).select(:id)
-      app_ds = app_ds.where(:id=>params[:application].to_i) if params[:application] && !params[:application].empty?
-      ds = where(:application_id=>app_ds)
+      ds = where(:user_id=>user_id.to_i)
+      ds = where(:application_id=>params[:application].to_i) if params[:application] && !params[:application].empty?
       ds = ds.where(:error_class=>params[:class].to_s) if params[:class] && !params[:class].empty?
       ds = ds.where(:message=>params[:message].to_s) if params[:message] && !params[:message].empty?
       ds = ds.where(:closed=>params[:closed] == '1') if params[:closed] && !params[:closed].empty?
@@ -41,7 +40,7 @@ class Error < Sequel::Model
 
     # Return dataset with errors restricted to the given user.
     def with_user(user_id)
-      where(:application_id=>Application.where(:user_id=>user_id).select(:id))
+      where(:user_id=>user_id)
     end
   end
 

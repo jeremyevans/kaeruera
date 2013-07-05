@@ -18,7 +18,8 @@ module KaeruEra
     def initialize(uri, email, application)
       @db = uri.is_a?(Sequel::Database) ? uri : Sequel.connect(uri, :keep_reference=>false)
       @db.extension :pg_array, :pg_hstore, :pg_json
-      raise(Error, "No matching application in database for #{email}/#{application}") unless @application_id = @db[:applications].where(:user_id=>@db[:users].where(:email=>email).get(:id), :name=>application).get(:id)
+      @application_id, @user_id = @db[:applications].where(:user_id=>@db[:users].where(:email=>email).get(:id), :name=>application).get([:id, :user_id])
+      raise(Error, "No matching application in database for #{email}/#{application}") unless @application_id
     end
 
     # If an error cannot be determined, returns false.
@@ -32,6 +33,7 @@ module KaeruEra
       return false unless error = opts[:error] || $!
 
       h = {
+        :user_id=>@user_id,
         :application_id=>@application_id,
         :error_class=>error.class.name,
         :message=>error.message.to_s,

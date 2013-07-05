@@ -17,4 +17,12 @@ class Application < Sequel::Model
     end
     super
   end
+
+  private
+
+  # Set the user_id on the error before saving it.
+  def _add_app_error(error)
+    error.user_id = user_id
+    super
+  end
 end

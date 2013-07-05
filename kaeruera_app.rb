@@ -229,10 +229,11 @@ module KaeruEra
     post '/report_error' do
       params = JSON.parse(request.body.read)
       data = params['data']
-      app_id = Application.first!(:token=>params['token'].to_s, :id=>params['id'].to_i).id
+      halt(404, "No matching application") unless app = Application.first!(:token=>params['token'].to_s, :id=>params['id'].to_i)
 
       h = {
-        :application_id=>app_id,
+        :user_id=>app.user_id,
+        :application_id=>app.id,
         :error_class=>data['error_class'],
         :message=>data['message'],
         :backtrace=>Sequel.pg_array(data['backtrace'])

@@ -12,11 +12,13 @@ Sequel.migration do
       String :name, :null=>false
       String :token, :null=>false
       unique [:user_id, :name]
+      unique [:user_id, :id]
     end
 
     create_table(:errors) do
       primary_key :id
-      foreign_key :application_id, :applications, :null=>false, :index=>true
+      Integer :user_id, :null=>false
+      foreign_key :application_id, :applications, :index=>true
       Time :created_at, :null=>false, :default=>Sequel::CURRENT_TIMESTAMP, :index=>true
       TrueClass :closed, :default=>false, :index=>true
       String :error_class, :null=>false, :index=>true
@@ -26,6 +28,8 @@ Sequel.migration do
       json :params
       json :session
       String :notes
+
+      foreign_key [:user_id, :application_id], :applications, :key=>[:user_id, :id]
 
       full_text_index Sequel.cast(:params, String), :index_type=>:gist, :name=>:errors_params_index
       full_text_index Sequel.cast(:session, String), :index_type=>:gist, :name=>:errors_session_index
