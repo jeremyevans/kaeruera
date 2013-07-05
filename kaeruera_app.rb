@@ -15,6 +15,11 @@ module KaeruEra
   class App < Sinatra::Base
     REPORTER = (DatabaseReporter.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
     PER_PAGE = 25
+    if ENV['DEMO_MODE'] == '1'
+      DEMO_MODE = true
+    else
+      DEMO_MODE = false
+    end
 
     set :environment, 'production'
     disable :run
@@ -116,15 +121,17 @@ module KaeruEra
       redirect '/login'
     end
 
-    get '/change_password' do
-      erb :change_password
-    end
-    post '/change_password' do
-      user = User.with_pk!(session[:user_id])
-      user.password = params[:password].to_s
-      user.save
-      flash[:notice] = "Password Changed"
-      redirect('/', 303)
+    unless DEMO_MODE
+      get '/change_password' do
+        erb :change_password
+      end
+      post '/change_password' do
+        user = User.with_pk!(session[:user_id])
+        user.password = params[:password].to_s
+        user.save
+        flash[:notice] = "Password Changed"
+        redirect('/', 303)
+      end
     end
 
     get '/add_application' do
