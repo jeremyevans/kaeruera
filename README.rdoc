@@ -20,7 +20,7 @@ KaeruEra is not designed to replace an existing error tracking
 application.  It's designed to supplement an email notification
 about the error.
 
-[1] (https://github.com/errbit/errbit)
+1. (https://github.com/errbit/errbit)
 
 == Demo
 
@@ -58,7 +58,7 @@ pages:
 * Search page (options for each search field)
 * Error List page (see open errors for applications/search results)
 * Error page (see all information about a particular error,
-    with links to perform searches for similar errors)
+  with links to perform searches for similar errors)
 
 === Error Information Tracked
 
@@ -159,10 +159,10 @@ since the assumption is that it is better to raise the original error in that ca
 
 The return value of the reporting methods is one of the following:
 
-Integer: The id of the error, indicating the error was successfully reported.
-false: There was no error detected (:error option was not set and $! did not indicate an active error)
-true: The async reporter received a valid error (it cannot tell whether the error was successfully reported).
-StandardError: an exception occurred when trying to report the error, the return value is the exception.
+Integer :: The id of the error, indicating the error was successfully reported.
+false :: There was no error detected (:error option was not set and $! did not indicate an active error)
+true :: The async reporter received a valid error (it cannot tell whether the error was successfully reported).
+StandardError :: an exception occurred when trying to report the error, the return value is the exception.
 
 === Sinatra
 
