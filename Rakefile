@@ -1,34 +1,38 @@
 require "rake"
-require "spec/rake/spectask"
 
 # Specs
 
-task :default=>[:database_reporter_spec, :reporter_spec, :model_spec, :web_spec]
+begin
+  require "spec/rake/spectask"
 
-desc "Run model specs"
-Spec::Rake::SpecTask.new("model_spec") do |t|
-  t.spec_files = ["spec/model_spec.rb"]
-end
+  task :default=>[:database_reporter_spec, :reporter_spec, :model_spec, :web_spec]
 
-desc "Run database_reporter specs"
-Spec::Rake::SpecTask.new("database_reporter_spec") do |t|
-  t.spec_files = ["spec/database_reporter_spec.rb"]
-end
-
-desc "Run reporter specs"
-task "reporter_spec" do |t|
-  sh %{echo > spec/unicorn.test.log}
-  begin
-    sh %{#{FileUtils::RUBY} -S unicorn -c spec/unicorn.test.conf -D config.ru}
-    sh %{#{FileUtils::RUBY} -S spec spec/reporter_spec.rb}
-  ensure
-    sh %{kill `cat spec/unicorn.test.pid`}
+  desc "Run model specs"
+  Spec::Rake::SpecTask.new("model_spec") do |t|
+    t.spec_files = ["spec/model_spec.rb"]
   end
-end
 
-desc "Run web specs"
-Spec::Rake::SpecTask.new("web_spec") do |t|
-  t.spec_files = ["spec/web_spec.rb"]
+  desc "Run database_reporter specs"
+  Spec::Rake::SpecTask.new("database_reporter_spec") do |t|
+    t.spec_files = ["spec/database_reporter_spec.rb"]
+  end
+
+  desc "Run reporter specs"
+  task "reporter_spec" do |t|
+    sh %{echo > spec/unicorn.test.log}
+    begin
+      sh %{#{FileUtils::RUBY} -S unicorn -c spec/unicorn.test.conf -D config.ru}
+      sh %{#{FileUtils::RUBY} -S spec spec/reporter_spec.rb}
+    ensure
+      sh %{kill `cat spec/unicorn.test.pid`}
+    end
+  end
+
+  desc "Run web specs"
+  Spec::Rake::SpecTask.new("web_spec") do |t|
+    t.spec_files = ["spec/web_spec.rb"]
+  end
+rescue LoadError
 end
 
 # Migrations
