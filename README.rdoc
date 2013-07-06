@@ -1,0 +1,287 @@
+= KaeruEra
+
+KaeruEra is a bare-bones error tracking application for ruby, tracking
+errors that occur in other ruby applications.
+
+It is similar to Errbit[1] but with a much smaller feature set.  The
+only advantages that KaeruEra has over Errbit are more advanced
+search features, fewer dependencies, and a smaller footprint.  There
+are no notification features, source control integration, issue tracker
+integration, user information tracking, deploy tracking, or GitHub/LDAP
+authentication.  You are responsible for manually integrating the error
+reporter into the applications that will be reporting errors.
+
+As another example of the simplicity, KaeruEra does not do error
+aggregation.  Instead, for each error, it offers the ability to easily
+search for errors with the same class, message, backtrace line, etc..
+Any results of that search can be manipulated as a unit.
+
+KaeruEra is not designed to replace an existing error tracking
+application.  It's designed to supplement an email notification
+about the error.
+
+[1] (https://github.com/errbit/errbit)
+
+== Demo
+
+* URL: http://kaeruera.herokuapp.com
+* Login Email: demo
+* Login Password: demo
+
+== Source Control/Issue Tracker
+
+https://github.com/jeremyevans/kaeruera
+
+== License
+
+KaeruEra is licensed under the MIT License.
+
+== Design
+
+The KaeruEra database and web server have a fairly simple design.
+There are only three tables in the database, users, applications,
+and errors.  Each user can have multiple applications, and each
+application multiple errors.
+
+In the database, each error is stored is a single row, document
+style.  This uses PostgreSQL's advanced types, storing the
+backtrace for the error as an array of text fields (text[]),
+the environment as an hstore (string key/string value hash table),
+and the params and session information as json (since they often
+contain nested data).  All of the error columns are indexed for
+easy searching.
+
+The web site has a very basic bootstrap design, with only 4 main
+pages:
+
+* Front page (choose an application)
+* Search page (options for each search field)
+* Error List page (see open errors for applications/search results)
+* Error page (see all information about a particular error,
+    with links to perform searches for similar errors)
+
+=== Error Information Tracked
+
+* Exception Class
+* Exception Message
+* Exception Backtrace
+* Params
+* Environment Variables
+* Session Variables
+
+The exception class, message, and backtrace are required and are
+taken from the underlying ruby exception.
+
+The params, environment, and session information are optional, and
+you have to configure the reporting code to include the
+information.
+
+=== Updating Errors
+
+Most information for errors is immutable.  The two exceptions are that each error has a notes
+field and an open/closed flag.  As long as the error is open, the notes flag can be updated and
+it can be closed.  Once it is closed, the error is completely immutable.
+
+== Reporting Errors
+
+KaeruEra is not airbrake compatible.  Instead, it offers separate
+libraries for reporting errors.  All libraries are shipped in the
+kaeruera gem, installable via:
+
+  gem install kaeruera
+
+=== KaeruEra::DatabaseReporter
+
+This library assumes you can have a direct connection to the
+database, and inserts the error directly into the database.
+
+  require 'kaeruera/database_reporter'
+  REPORTER = KaeruEra::DatabaseReporter.new('postgres://db_user:pass@host:port/database', 'email@example.com', 'app_name')
+
+Here db_user is the PostgreSQL user name for the connection, email
+is the email address for the user account in the KaeruEra application,
+and app_name is the application name in KaeruEra.
+
+=== KaeruEra::Reporter
+
+This library uploads the error information to a server
+running the web application, via json.
+
+  require 'kaeruera/reporter'
+  REPORTER = KaeruEra::Reporter.new('http://host:port/report_error', application_id, 'application_token')
+
+You can use the "Reporter Info" page in the web application to get a line that will work for the given
+application.
+
+=== KaeruEra::AsyncReporter
+
+This library is the same as the KaeruEra::Reporter library,
+except it runs asynchronously, useful if the application does
+not have a fast connection to the KaeruEra server.  The downside
+is you don't get the id of the error, and are not notified
+if there was a problem reporting the error.
+
+  require 'kaeruera/async_reporter'
+  REPORTER = KaeruEra::AsyncReporter.new('http://host:port/report_error', application_id, 'application_token')
+
+=== Usage
+
+All three libraries for reporting errors have the same API:
+
+  REPORTER.report
+
+If called without arguments, it assumes that $! is the error to report.  This makes it easy to use
+in a rescue block:
+
+  begin
+    #code
+  rescue
+    REPORTER.report
+  end
+
+If the error you want to report is not in $!, you can pass it via the :error option:
+
+  begin
+    #code
+  rescue => e
+    begin
+      #more code
+    rescue
+      REPORTER.report(:error => e)
+    end
+  end
+
+The params, session, and environment variables are all passed as options :params, :session, and :env.
+In each case the values for those options should be hashes.
+
+As reporters are designed to be used in rescue blocks, they swallow any errors raised internally,
+since the assumption is that it is better to raise the original error in that case.
+
+The return value of the reporting methods is one of the following:
+
+Integer: The id of the error, indicating the error was successfully reported.
+false: There was no error detected (:error option was not set and $! did not indicate an active error)
+true: The async reporter received a valid error (it cannot tell whether the error was successfully reported).
+StandardError: an exception occurred when trying to report the error, the return value is the exception.
+
+=== Sinatra
+
+If the application reporting errors is running sinatra, you can probably put this in your error block
+to report errors to KaeruEra:
+
+  REPORTER.report(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
+
+== Runtime Dependencies
+
+=== KaeruEra::App (web server)
+
+* PostgreSQL 9.2+
+* pg
+* sinatra
+* sequel
+* bcrypt-ruby
+* forme
+* json
+* rack_csrf
+* rack-compatible web server
+
+=== KaeruEra::DatabaseReporter
+
+* pg
+* sequel
+
+=== KaeruEra::Reporter / KaeruEra::AsyncReporter
+
+* rest-client
+* json
+
+== Heroku Setup
+
+TODO
+
+== Manual Setup
+
+=== Database Setup
+
+First, copy the example database configuration file:
+
+  cp db_config.rb.example db_config.rb
+
+The rest of the instructions assume you are not modifying the
+default database configuration, and that the database super user
+for your PostgreSQL database cluster is postgres.  If those
+assumptions are inaccurate, you should substitute the appropriate
+values.  Also, the examples below do not use a password for the
+accounts, so they will only work if localhost is trusted in PostgreSQL.
+
+Create a user for the application:
+
+  createuser -U postgres kaeruera
+
+Then, create databases for the application with that user:
+
+  createdb -U postgres -O kaeruera kaeruera_development
+  createdb -U postgres -O kaeruera kaeruera_test
+  createdb -U postgres -O kaeruera kaeruera_production
+
+If you don't have hstore as a default extension in your PostgreSQL
+template database, you'll have to add it:
+
+  echo 'CREATE EXTENSION hstore' | psql -U postgres kaeruera_development
+  echo 'CREATE EXTENSION hstore' | psql -U postgres kaeruera_test
+  echo 'CREATE EXTENSION hstore' | psql -U postgres kaeruera_production
+
+Then, you can migrate the database:
+
+  rake dev_up
+  rake test_up
+  rake production_up
+
+=== User Account Setup
+
+In development mode, the first time the server is started, if you haven't
+set up any users manually, a kaeruera user account (login/password kaeruera)
+and application named KaeruEraApp will automatically be created for you.
+It's recommended that you change the password for this user after logging
+in for the first time in development mode.
+
+In all other cases, you have to setup your user accounts manually:
+
+  $ irb -r ./models
+  User.create(:email=>'foo', :password=>'bar')
+
+It's recommended that you have a kaeruera user and KaeruEraApp application
+for that user, as that is where the web application will log any internal
+errors.
+
+=== Session Secret Setup
+
+Create the session secret file:
+
+  ruby -rsecurerandom -e 'puts SecureRandom.hex(30)' > kaeruera.secret
+
+== Testing
+
+To run all tests, use rake's default task:
+
+  rake
+
+This assumes you have already created the test database and migrated the
+test database to the latest version.  The following are additional
+requirements when running tests:
+
+* Rspec 1
+* Unicorn
+* Capybara
+
+== Naming
+
+KaeruEra is a transliteration of the Japanese words for frog (kaeru)
+and error (era).  One of the first popular error reporting apps for
+ruby was named Hoptoad (later renamed to Airbrake), and Errbit I'm
+guessing was chosen for its similarity to ribbit (the sound a frog
+makes) so this is in keeping with the frog theme.
+
+== Author
+
+Jeremy Evans <code@jeremyevans.net>
