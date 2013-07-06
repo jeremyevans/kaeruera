@@ -16,7 +16,7 @@ module KaeruEra
     # The reporter used for reporting internal errors.  Defaults to the same database
     # used to store the errors for the applications that this server tracks.  This
     # causes obvious issues if the Database for this server goes down.
-    REPORTER = (DatabaseReporter.new(DB, 'kaeruera', 'KaeruEraApp') rescue nil)
+    REPORTER = (DatabaseReporter.new(DB, ENV['KAERUERA_INTERNAL_ERROR_USER']||'kaeruera', 'KaeruEraApp') rescue nil)
 
     # The number of errors to show per page on the application and search result pages.
     # Currently hardcoded, but will probably be made user specific at some point.
