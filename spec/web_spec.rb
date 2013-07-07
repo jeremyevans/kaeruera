@@ -113,7 +113,7 @@ describe KaeruEra do
 
     bt = all("#content ol li").map{|s| s.text}
     bt[0].should =~ /spec\/web_spec.rb/
-    bt[-1].should =~ /<main>/
+    bt[-1].should =~ /<main>|spec/
 
     tables = all("#content table")
     tables[0].all("td").map{|s| s.text}.should == %w'banana apple'
