@@ -85,9 +85,9 @@ module KaeruEra
       query = env['QUERY_STRING']
       found_page = false
       if query && !query.empty?
-        query = query.sub(/page=(\d+)\z/) do
+        query = query.sub(/page=(\d+)(\z|&)/) do
           found_page = true
-          "page=#{$1.to_i+i}"
+          "page=#{$1.to_i+i}#{$2}"
         end 
         if found_page == false && i == 1
           query += "&page=2"
