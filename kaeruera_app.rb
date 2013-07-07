@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'erb'
 require 'sinatra/base'
 require 'rack/csrf'

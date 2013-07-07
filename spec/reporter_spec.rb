@@ -1,3 +1,4 @@
+require 'rubygems'
 ENV['RACK_ENV'] = 'test'
 $: << File.dirname(File.dirname(__FILE__))
 $: << File.join(File.dirname(File.dirname(__FILE__)), 'lib')

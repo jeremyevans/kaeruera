@@ -1,3 +1,4 @@
+require 'rubygems'
 ENV['RACK_ENV'] = 'test'
 require 'capybara'
 require 'capybara/dsl'
