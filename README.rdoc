@@ -178,6 +178,7 @@ to report errors to KaeruEra:
 * PostgreSQL 9.2+
 * pg
 * sinatra
+* sinatra-flash
 * sequel
 * bcrypt-ruby
 * forme
@@ -197,7 +198,15 @@ to report errors to KaeruEra:
 
 == Heroku Setup
 
-TODO
+  heroku create
+  heroku addons:add heroku-postgresql:dev
+  heroku pg:promote HEROKU_POSTGRESQL_COLOR_URL
+  git push heroku master
+  echo 'CREATE EXTENSION hstore' | heroku pg:psql
+  heroku run rake production_up
+  heroku config:set KAERUERA_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.hex(30)'`
+  heroku run irb -r ./models
+  irb> User.create(:email=>'foo', :password=>'bar')
 
 == Manual Setup
 
