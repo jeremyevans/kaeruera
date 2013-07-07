@@ -41,13 +41,13 @@ module KaeruEra
       }
 
       if v = opts[:params]
-        h[:params] = Sequel.pg_json(v)
+        h[:params] = Sequel.pg_json(v.to_hash)
       end
       if v = opts[:session]
-        h[:session] = Sequel.pg_json(v)
+        h[:session] = Sequel.pg_json(v.to_hash)
       end
       if v = opts[:env]
-        h[:env] = Sequel.hstore(v)
+        h[:env] = Sequel.hstore(v.to_hash)
       end
 
       @db[:errors].insert(h)
