@@ -260,8 +260,8 @@ describe KaeruEra do
   it "should allowing viewing reporter information for application" do
     click_link 'KaeruEraApp'
     click_link 'Reporter Info'
-    page.html.should =~ %r|KaeruEra::Reporter.new\("http://www.example.com:80/report_error", \d+, "[0-9a-f]+"\)|
-    page.html.should =~ %r|KaeruEra::AsyncReporter.new\("http://www.example.com:80/report_error", \d+, "[0-9a-f]+"\)|
+    page.html.should =~ %r|KaeruEra::Reporter.new\("http://www.example.com(:80)?/report_error", \d+, "[0-9a-f]+"\)|
+    page.html.should =~ %r|KaeruEra::AsyncReporter.new\("http://www.example.com(:80)?/report_error", \d+, "[0-9a-f]+"\)|
   end
 
   it "should allow creating new applications" do
