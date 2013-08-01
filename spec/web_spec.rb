@@ -110,7 +110,7 @@ describe KaeruEra do
     info[2].should == 'Class: RuntimeError'
     info[3].should =~ /\AMessage:.+foo/
     info[4].should == 'Status: Open'
-    info[5].should =~ /\AOccured On:\s+#{Date.today.strftime('%Y\\s+-\\s+%m\\s+-\\s+%d')}/
+    info[5].should =~ /\AOccured On:\s+\d+\s+-\s+\d+\s+-\s+\d+\s+T\s+\d+\s+:\s+\d+\s+:\s+\d+/
 
     bt = all("#content ol li").map{|s| s.text}
     bt[0].should =~ /spec\/web_spec.rb/
