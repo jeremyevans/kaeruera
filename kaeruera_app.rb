@@ -1,11 +1,10 @@
 require 'rubygems'
 require 'erb'
-require 'sinatra/base'
+require 'roda'
 require 'rack/csrf'
 require 'models'
 require 'json'
-require 'forme/sinatra'
-require 'sinatra/flash'
+require 'rack/protection'
 $: << './lib'
 require 'kaeruera/database_reporter'
 
@@ -13,7 +12,7 @@ Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>
 Forme.default_config = :mine
 
 module KaeruEra
-  class App < Sinatra::Base
+  class App < Roda
     # The reporter used for reporting internal errors.  Defaults to the same database
     # used to store the errors for the applications that this server tracks.  This
     # causes obvious issues if the Database for this server goes down.
@@ -30,16 +29,19 @@ module KaeruEra
       DEMO_MODE = false
     end
 
-    set :environment, 'production'
-    disable :run
     use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
     use Rack::Csrf, :skip => ['POST:/report_error']
-    register Sinatra::Flash
-    helpers Forme::Sinatra::ERB
+    use Rack::Static, :urls=>%w'/bootstrap.min.css /application.css', :root=>'public'
+    use Rack::Protection
 
-    def h(text)
-      Rack::Utils.escape_html(text)
-    end
+    plugin :indifferent_params
+    plugin :not_found
+    plugin :error_handler
+    plugin :render
+    plugin :flash
+    plugin :h
+    plugin :halt
+    plugin :forme
 
     def url_escape(text)
       Rack::Utils.escape(text)
@@ -51,13 +53,8 @@ module KaeruEra
     end
 
     # Returns the application with the given id for the logged in user.
-    def get_application
-      @app = Application.first!(:user_id=>session[:user_id], :id=>params[:application_id].to_i)
-    end
-
-    # Returns the application with the given id for the logged in user.
-    def get_error
-      @error = Error.with_user(session[:user_id]).first!(:id=>params[:id].to_i)
+    def get_error(id)
+      @error = Error.with_user(session[:user_id]).first!(:id=>id.to_i)
     end
 
     # Does a simple pagination of the results of the dataset.  This
@@ -114,144 +111,155 @@ module KaeruEra
       "<a class='btn' href=\"#{modify_page(1)}\">Next Page</a>"
     end
 
-    # Force users to login before using the site, except for error
-    # reporting (which uses the application's token).
-    before do
-      unless %w'/application.css /favicon.ico /login /logout /report_error'.include?(env['PATH_INFO'])
-        redirect('/login', 303) if !session[:user_id]
-      end
-    end
-
     # If an internal error occurs, record it so that the application
     # can track its own errors.
-    error do
+    error do |e|
       if REPORTER
-        REPORTER.report(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
+        REPORTER.report(:params=>request.params, :env=>env, :session=>session, :error=>e)
       end
-      erb("Sorry, an error occurred")
+      #$stderr.puts e.class, e.message, e.backtrace
+      view(:inline=>"Sorry, an error occurred")
     end
 
-    get '/login' do
-      render :erb, :login
-    end
+    route do |r|
+      r.is 'login' do
+        r.get do
+          view :login
+        end
 
-    post '/login' do
-      if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
-        session[:user_id] = i
-        flash[:notice] = "Logged In"
-        redirect('/', 303)
-      else
-        flash[:error] = "No matching email/password"
-        redirect('/login', 303)
+        r.post do
+          if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
+            session[:user_id] = i
+            flash[:notice] = "Logged In"
+            r.redirect('/', 303)
+          else
+            flash[:error] = "No matching email/password"
+            r.redirect('/login', 303)
+          end
+        end
       end
-    end
-    
-    post '/logout' do
-      session.clear
-      flash[:notice] = "Logged Out"
-      redirect '/login'
-    end
-
-    unless DEMO_MODE
-      get '/change_password' do
-        erb :change_password
-      end
-
-      post '/change_password' do
-        user = User.with_pk!(session[:user_id])
-        user.password = params[:password].to_s
-        user.save
-        flash[:notice] = "Password Changed"
-        redirect('/', 303)
-      end
-    end
-
-    get '/add_application' do
-      erb :add_application
-    end
-
-    post '/add_application' do
-      Application.create(:user_id=>session[:user_id], :name=>params[:name])
-      flash[:notice] = "Application Added"
-      redirect('/', 303)
-    end
-
-    get '/' do
-      @apps = user_apps.order(:name).all
-      erb :applications
-    end
-
-    get '/applications/:application_id/reporter_info' do
-      get_application
-      erb :reporter_info
-    end
-
-    get '/applications/:application_id/errors' do
-      get_application
-      @errors = paginator(@app.app_errors_dataset.open.most_recent)
-      erb :errors
-    end
-
-    get '/error/:id' do
-      @error = get_error
-      erb :error
-    end
-
-    post '/update_error/:id' do
-      @error = get_error
-      halt(403, erb("Error Not Open")) if @error.closed
-      @error.closed = true if params[:close] == '1'
-      @error.update(:notes=>params[:notes].to_s)
-      flash[:notice] = "Error Updated"
-      redirect("/error/#{@error.id}")
-    end
-
-    post '/update_multiple_errors' do
-      h = {:notes=>params[:notes].to_s}
-      h[:closed] = true if params[:close] == '1'
-      n = Error.
-        with_user(session[:user_id]).
-        where(:id=>params[:ids].to_a.map{|x| x.to_i}, :closed=>false).
-        update(h)
-      flash[:notice] = "Updated #{n} errors"
-      redirect("/")
-    end
-
-    get '/search' do
-      if search = params[:search]
-        @errors = paginator(Error.search(params, session[:user_id]).most_recent)
-        erb :errors
-      else
-        @apps = user_apps.order(:name).all
-        erb :search
-      end
-    end
-
-    post '/report_error' do
-      params = JSON.parse(request.body.read)
-      data = params['data']
-      halt(404, "No matching application") unless app = Application.first!(:token=>params['token'].to_s, :id=>params['id'].to_i)
-
-      h = {
-        :user_id=>app.user_id,
-        :application_id=>app.id,
-        :error_class=>data['error_class'],
-        :message=>data['message'],
-        :backtrace=>Sequel.pg_array(data['backtrace'])
-      }
-
-      if v = data['params']
-        h[:params] = Sequel.pg_json(v.to_hash)
-      end
-      if v = data['session']
-        h['session'] = Sequel.pg_json(v.to_hash)
-      end
-      if v = data['env']
-        h[:env] = Sequel.hstore(v.to_hash)
+      
+      r.post 'logout' do
+        session.clear
+        flash[:notice] = "Logged Out"
+        r.redirect '/login'
       end
 
-      error_id = DB[:errors].insert(h)
-      "{\"error_id\": #{error_id}}"
+      r.post 'report_error' do
+        params = JSON.parse(request.body.read)
+        data = params['data']
+        r.halt(404, "No matching application") unless app = Application.first!(:token=>params['token'].to_s, :id=>params['id'].to_i)
+
+        h = {
+          :user_id=>app.user_id,
+          :application_id=>app.id,
+          :error_class=>data['error_class'],
+          :message=>data['message'],
+          :backtrace=>Sequel.pg_array(data['backtrace'])
+        }
+
+        if v = data['params']
+          h[:params] = Sequel.pg_json(v.to_hash)
+        end
+        if v = data['session']
+          h['session'] = Sequel.pg_json(v.to_hash)
+        end
+        if v = data['env']
+          h[:env] = Sequel.hstore(v.to_hash)
+        end
+
+        error_id = DB[:errors].insert(h)
+        "{\"error_id\": #{error_id}}"
+      end
+
+      # Force users to login before using the site, except for error
+      # reporting (which uses the application's token).
+      r.redirect('/login', 303) unless session[:user_id]
+
+      unless DEMO_MODE
+        r.is 'change_password' do
+          r.get do
+            view :change_password
+          end
+
+          r.post do
+            user = User.with_pk!(session[:user_id])
+            user.password = params[:password].to_s
+            user.save
+            flash[:notice] = "Password Changed"
+            r.redirect('/', 303)
+          end
+        end
+      end
+
+      r.is 'add_application' do
+        r.get do
+          view :add_application
+        end
+
+        r.post do
+          Application.create(:user_id=>session[:user_id], :name=>params[:name])
+          flash[:notice] = "Application Added"
+          r.redirect('/', 303)
+        end
+      end
+
+      r.get do
+        r.is "" do
+          @apps = user_apps.order(:name).all
+          view :applications
+        end
+
+        r.on 'applications/:application_id' do |id|
+          @app = Application.first!(:user_id=>session[:user_id], :id=>id.to_i)
+
+          r.is 'reporter_info' do
+            view :reporter_info
+          end
+
+          r.is 'errors' do
+            @errors = paginator(@app.app_errors_dataset.open.most_recent)
+            view :errors
+          end
+        end
+
+        r.is 'error/:id' do |id|
+          @error = get_error(id)
+          view :error
+        end
+
+        r.is 'search' do
+          if search = r['search']
+            @errors = paginator(Error.search(params, session[:user_id]).most_recent)
+            view :errors
+          else
+            @apps = user_apps.order(:name).all
+            view :search
+          end
+        end
+      end
+
+      r.post do
+        r.is 'update_error/:id' do |id|
+          @error = get_error(id)
+          r.halt(403, view(:inline=>"Error Not Open")) if @error.closed
+          @error.closed = true if params[:close] == '1'
+          @error.update(:notes=>params[:notes].to_s)
+          flash[:notice] = "Error Updated"
+          r.redirect("/error/#{@error.id}")
+        end
+
+        r.is 'update_multiple_errors' do
+          h = {:notes=>params[:notes].to_s}
+          h[:closed] = true if params[:close] == '1'
+          n = Error.
+            with_user(session[:user_id]).
+            where(:id=>params[:ids].to_a.map{|x| x.to_i}, :closed=>false).
+            update(h)
+          flash[:notice] = "Updated #{n} errors"
+          r.redirect("/")
+        end
+      end
     end
   end
 end
