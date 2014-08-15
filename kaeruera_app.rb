@@ -135,7 +135,7 @@ module KaeruEra
             r.redirect('/')
           else
             flash[:error] = "No matching email/password"
-            r.redirect('/login')
+            r.redirect
           end
         end
       end
