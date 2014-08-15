@@ -1,9 +1,7 @@
 require 'rubygems'
 require 'erb'
 require 'roda'
-require 'rack/csrf'
 require 'models'
-require 'json'
 require 'rack/protection'
 $: << './lib'
 require 'kaeruera/database_reporter'
@@ -30,7 +28,7 @@ module KaeruEra
     end
 
     use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
-    use Rack::Csrf, :skip => ['POST:/report_error']
+    plugin :csrf, :skip => ['POST:/report_error']
     use Rack::Static, :urls=>%w'/bootstrap.min.css /application.css', :root=>'public'
     use Rack::Protection
 
@@ -41,7 +39,10 @@ module KaeruEra
     plugin :flash
     plugin :h
     plugin :halt
+    plugin :json
     plugin :forme
+    plugin :symbol_matchers
+    plugin :symbol_views
 
     def url_escape(text)
       Rack::Utils.escape(text)
@@ -124,17 +125,17 @@ module KaeruEra
     route do |r|
       r.is 'login' do
         r.get do
-          view :login
+          :login
         end
 
         r.post do
           if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
             session[:user_id] = i
             flash[:notice] = "Logged In"
-            r.redirect('/', 303)
+            r.redirect('/')
           else
             flash[:error] = "No matching email/password"
-            r.redirect('/login', 303)
+            r.redirect('/login')
           end
         end
       end
@@ -168,18 +169,17 @@ module KaeruEra
           h[:env] = Sequel.hstore(v.to_hash)
         end
 
-        error_id = DB[:errors].insert(h)
-        "{\"error_id\": #{error_id}}"
+        {'error_id' => DB[:errors].insert(h)}
       end
 
       # Force users to login before using the site, except for error
       # reporting (which uses the application's token).
-      r.redirect('/login', 303) unless session[:user_id]
+      r.redirect('/login') unless session[:user_id]
 
       unless DEMO_MODE
         r.is 'change_password' do
           r.get do
-            view :change_password
+            :change_password
           end
 
           r.post do
@@ -187,14 +187,14 @@ module KaeruEra
             user.password = params[:password].to_s
             user.save
             flash[:notice] = "Password Changed"
-            r.redirect('/', 303)
+            r.redirect('/')
           end
         end
       end
 
       r.is 'add_application' do
         r.get do
-          view :add_application
+          :add_application
         end
 
         r.post do
@@ -207,40 +207,40 @@ module KaeruEra
       r.get do
         r.is "" do
           @apps = user_apps.order(:name).all
-          view :applications
+          :applications
         end
 
-        r.on 'applications/:application_id' do |id|
+        r.on 'applications/:d' do |id|
           @app = Application.first!(:user_id=>session[:user_id], :id=>id.to_i)
 
           r.is 'reporter_info' do
-            view :reporter_info
+            :reporter_info
           end
 
           r.is 'errors' do
             @errors = paginator(@app.app_errors_dataset.open.most_recent)
-            view :errors
+            :errors
           end
         end
 
-        r.is 'error/:id' do |id|
+        r.is 'error/:d' do |id|
           @error = get_error(id)
-          view :error
+          :error
         end
 
         r.is 'search' do
           if search = r['search']
             @errors = paginator(Error.search(params, session[:user_id]).most_recent)
-            view :errors
+            :errors
           else
             @apps = user_apps.order(:name).all
-            view :search
+            :search
           end
         end
       end
 
       r.post do
-        r.is 'update_error/:id' do |id|
+        r.is 'update_error/:d' do |id|
           @error = get_error(id)
           r.halt(403, view(:inline=>"Error Not Open")) if @error.closed
           @error.closed = true if params[:close] == '1'
