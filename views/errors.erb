@@ -2,7 +2,7 @@
 
 <% if @errors.empty? %>
   <% if @app %>
-    <h2>No open errors for <%=h @app.name %></h2>
+    <h2>No open errors for <%= @app.name %></h2>
   <% else %>
     <h2>No errors matching your search criteria</h2>
   <% end %>
@@ -21,34 +21,34 @@
   <% @errors.each do |error| %>
     <tr>
       <td><a href="/error/<%= error.id %>"><%= error.id %></a></td>
-      <td><%=h error.error_class %></td>
-      <td><%=h error.message %></td>
-      <td><%=h error.status %></td>
-      <td><%=h error.created_at.strftime('%F %T') %></td>
+      <td><%= error.error_class %></td>
+      <td><%= error.message %></td>
+      <td><%= error.status %></td>
+      <td><%= error.created_at.strftime('%F %T') %></td>
     </tr>
   <% end %>
   </tbody>
   </table>
 
-  <%= previous_page %>
-  <%= next_page %>
+  <%== previous_page %>
+  <%== next_page %>
 
   <% if @next_page || @previous_page %>
     <% if @app %>
       <h2><a href="/applications/<%= @app.id %>/errors?all=1">Show All Open Errors</a></h2>
     <% else %>
-      <h2><a href="/search?<%=h env['QUERY_STRING'] %>&amp;all=1">Show All Errors in this Search</a></h2>
+      <h2><a href="/search?<%= env['QUERY_STRING'] %>&amp;all=1">Show All Errors in this Search</a></h2>
     <% end %>
   <% end %>
   
   <h2>Update All Open Errors on This Page</h2>
   <% form({:action=>"/update_multiple_errors", :method=>'post', :class=>'row'}, :wrapper=>nil) do |f| %>
     <% @errors.each do |e| %>
-      <%= f.input(:hidden, :name=>'ids[]', :value=>e.id) unless e.closed %>
+      <%== f.input(:hidden, :name=>'ids[]', :value=>e.id) unless e.closed %>
     <% end %>
-    <div class="span8"><%= f.input(:textarea, :name=>:notes, :id=>:notes, :label=>'Notes', :cols=>80, :rows=>6) %></div>
-    <div class="span4"><%= f.input(:checkbox, :no_hidden=>true, :value=>'1', :name=>'close', :id=>'close', :label=>'Close Errors?', :obj=>nil) %><br /><br />
-    <%= f.button(:class=>'btn btn-primary', :value=>'Update Errors') %></div>
+    <div class="span8"><%== f.input(:textarea, :name=>:notes, :id=>:notes, :label=>'Notes', :cols=>80, :rows=>6) %></div>
+    <div class="span4"><%== f.input(:checkbox, :no_hidden=>true, :value=>'1', :name=>'close', :id=>'close', :label=>'Close Errors?', :obj=>nil) %><br /><br />
+    <%== f.button(:class=>'btn btn-primary', :value=>'Update Errors') %></div>
   <% end %>
 <% end %>
 

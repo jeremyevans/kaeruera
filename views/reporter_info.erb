@@ -2,8 +2,8 @@
 
 <h2>Reporter</h2>
 
-<pre>KaeruEra::Reporter.new(&quot;http://<%=h env['HTTP_HOST'] %>/report_error&quot;, <%= @app.id %>, &quot;<%=h @app.token %>&quot;)</pre>
+<pre>KaeruEra::Reporter.new(&quot;http://<%= env['HTTP_HOST'] %>/report_error&quot;, <%= @app.id %>, &quot;<%= @app.token %>&quot;)</pre>
 
 <h2>AsyncReporter</h2>
 
-<pre>KaeruEra::AsyncReporter.new(&quot;http://<%=h env['HTTP_HOST'] %>/report_error&quot;, <%= @app.id %>, &quot;<%=h @app.token %>&quot;)</pre>
+<pre>KaeruEra::AsyncReporter.new(&quot;http://<%= env['HTTP_HOST'] %>/report_error&quot;, <%= @app.id %>, &quot;<%= @app.token %>&quot;)</pre>

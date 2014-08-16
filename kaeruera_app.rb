@@ -1,13 +1,9 @@
 require 'rubygems'
-require 'erb'
 require 'roda'
 require 'models'
 require 'rack/protection'
 $: << './lib'
 require 'kaeruera/database_reporter'
-
-Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
-Forme.default_config = :mine
 
 module KaeruEra
   class App < Roda
@@ -35,7 +31,7 @@ module KaeruEra
     plugin :indifferent_params
     plugin :not_found
     plugin :error_handler
-    plugin :render
+    plugin :render, :escape=>true
     plugin :flash
     plugin :h
     plugin :halt
@@ -43,6 +39,9 @@ module KaeruEra
     plugin :forme
     plugin :symbol_matchers
     plugin :symbol_views
+
+    Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
+    Forme.default_config = :mine
 
     def url_escape(text)
       Rack::Utils.escape(text)
@@ -119,7 +118,7 @@ module KaeruEra
         REPORTER.report(:params=>request.params, :env=>env, :session=>session, :error=>e)
       end
       #$stderr.puts e.class, e.message, e.backtrace
-      view(:inline=>"Sorry, an error occurred")
+      view(:content=>"Sorry, an error occurred")
     end
 
     route do |r|
@@ -242,7 +241,7 @@ module KaeruEra
       r.post do
         r.is 'update_error/:d' do |id|
           @error = get_error(id)
-          r.halt(403, view(:inline=>"Error Not Open")) if @error.closed
+          r.halt(403, view(:content=>"Error Not Open")) if @error.closed
           @error.closed = true if params[:close] == '1'
           @error.update(:notes=>params[:notes].to_s)
           flash[:notice] = "Error Updated"

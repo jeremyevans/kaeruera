@@ -2,11 +2,11 @@
 
 <h2>Info</h2>
 <ul>
-  <li>User: <%=h @error.application.user.email %></li>
-  <li>Application: <a href="/applications/<%= @error.application_id %>/errors"><%=h @error.application.name %></a></li>
-  <li>Class: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;class=<%=h url_escape(@error.error_class)%>"><%=h @error.error_class %></a></li>
-  <li>Message: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;message=<%=h url_escape(@error.message)%>"><%=h @error.message %></a></li>
-  <li>Status: <%=h @error.status %></li>
+  <li>User: <%= @error.application.user.email %></li>
+  <li>Application: <a href="/applications/<%= @error.application_id %>/errors"><%= @error.application.name %></a></li>
+  <li>Class: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;class=<%= url_escape(@error.error_class)%>"><%= @error.error_class %></a></li>
+  <li>Message: <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;message=<%= url_escape(@error.message)%>"><%= @error.message %></a></li>
+  <li>Status: <%= @error.status %></li>
   <li>Occured On: 
   <% at = @error.created_at %>
 <a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;occurred_after=<%= at.year %>-01-01&amp;occurred_before=<%= at.year+1 %>-01-01"><%= at.year %></a> -
@@ -20,14 +20,14 @@
 
 <% if @error.closed && @error.notes && !@error.notes.empty? %>
   <h2>Error Notes</h2>
-  <p><%=h @error.notes %></p>
+  <p><%= @error.notes %></p>
 <% else %>
   <h2>Update Error</h2>
   <% form(@error, {:action=>"/update_error/#{@error.id}", :method=>'post', :class=>'row'}, :wrapper=>nil) do |f| %>
     <div class="row">
-      <div class="span8"><%= f.input(:notes, :name=>:notes, :as=>:textarea, :cols=>80, :rows=>6) %></div>
-      <div class="span4"><%= f.input(:checkbox, :no_hidden=>true, :value=>'1', :name=>'close', :id=>'close', :label=>'Close Error?', :obj=>nil) %><br /><br />
-      <%= f.button(:class=>'btn btn-primary', :value=>'Update Error') %></div>
+      <div class="span8"><%== f.input(:notes, :name=>:notes, :as=>:textarea, :cols=>80, :rows=>6) %></div>
+      <div class="span4"><%== f.input(:checkbox, :no_hidden=>true, :value=>'1', :name=>'close', :id=>'close', :label=>'Close Error?', :obj=>nil) %><br /><br />
+      <%== f.button(:class=>'btn btn-primary', :value=>'Update Error') %></div>
     </div>
   <% end %>
 <% end %>
@@ -35,7 +35,7 @@
 <h2>Backtrace</h2>
 <ol>
 <% @error.backtrace.each do |line| %>
-  <li><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;backtrace=<%=h url_escape(line)%>"><%=h line %></a></li>
+  <li><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;backtrace=<%= url_escape(line)%>"><%= line %></a></li>
 <% end %>
 </ol>
 
@@ -53,11 +53,11 @@
     <% h.each do |k, v| %>
       <tr>
         <% if type == :env %>
-          <td class="key"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%=h url_escape(k)%>"><%=h k %></a></td>
-          <td class="value"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%=h url_escape(k)%>&amp;env_value=<%=h url_escape(v)%>"><%=h v %></a></td>
+          <td class="key"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%= url_escape(k)%>"><%= k %></a></td>
+          <td class="value"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%= url_escape(k)%>&amp;env_value=<%= url_escape(v)%>"><%= v %></a></td>
         <% else %>
-          <td class="key"><%=h k %></td>
-          <td class="value"><%=h v %></td>
+          <td class="key"><%= k %></td>
+          <td class="value"><%= v %></td>
         <% end %>
       </tr>
     <% end %>
