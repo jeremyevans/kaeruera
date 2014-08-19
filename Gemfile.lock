@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     bcrypt-ruby (3.0.1)
+    erubis (2.7.0)
     forme (1.0.0)
     json (1.8.1)
     kgio (2.8.1)
@@ -12,19 +13,13 @@ GEM
     rack_csrf (2.4.0)
       rack (>= 0.9)
     raindrops (0.10.0)
-    roda (0.9.0)
+    roda (1.0.0)
       rack
-    sequel (4.12.0)
-    sequel_pg (1.6.9)
+    sequel (4.13.0)
+    sequel_pg (1.6.10)
       pg (>= 0.8.0)
       sequel (>= 3.39.0)
-    sinatra (1.4.4)
-      rack (~> 1.4)
-      rack-protection (~> 1.4)
-      tilt (~> 1.3, >= 1.3.4)
-    sinatra-flash (0.3.0)
-      sinatra (>= 1.0.0)
-    tilt (1.4.1)
+    tilt (2.0.1)
     unicorn (4.8.0)
       kgio (~> 2.6)
       rack
@@ -35,14 +30,14 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt-ruby
-  forme (>= 0.8.0)
+  erubis
+  forme (>= 1.0.0)
   json
   pg
   rack-protection
   rack_csrf
-  roda
+  roda (>= 1.0)
   sequel
   sequel_pg
-  sinatra-flash
   tilt
   unicorn
