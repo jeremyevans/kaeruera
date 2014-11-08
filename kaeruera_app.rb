@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'roda'
-require 'models'
+require './models'
 require 'rack/protection'
 $: << './lib'
 require 'kaeruera/database_reporter'
@@ -25,13 +25,20 @@ module KaeruEra
 
     use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
     plugin :csrf, :skip => ['POST:/report_error']
-    use Rack::Static, :urls=>%w'/bootstrap.min.css /application.css', :root=>'public'
     use Rack::Protection
 
     plugin :indifferent_params
     plugin :not_found
     plugin :error_handler
     plugin :render, :escape=>true
+    plugin :assets,
+      :css=>%w'bootstrap.min.css application.scss',
+      :css_opts=>{:style=>:compressed, :cache=>false},
+      :css_dir=>nil,
+      :compiled_path=>nil,
+      :compiled_css_dir=>nil,
+      :precompiled=>'compiled_assets.json',
+      :prefix=>nil
     plugin :flash
     plugin :h
     plugin :halt
@@ -122,6 +129,8 @@ module KaeruEra
     end
 
     route do |r|
+      r.assets
+
       r.is 'login' do
         r.get do
           :login

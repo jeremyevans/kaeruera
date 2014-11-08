@@ -1,0 +1,23 @@
+.error-info {
+  width: 960px;
+  .key { width: 200px; }
+  .value { width: 700px; }
+  td, th {
+    display: inline-block;
+    white-space: pre-wrap;  
+    word-wrap: break-word;
+  }
+}
+
+table caption {
+  text-align: left;
+  font-size: 24px;
+  padding: 5px;
+}
+
+label {
+  display: inline;
+  margin-right: 5px;
+}
+
+input, textarea, select { width: auto; }
