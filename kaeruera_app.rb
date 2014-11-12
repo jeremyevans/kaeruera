@@ -30,7 +30,7 @@ module KaeruEra
     plugin :indifferent_params
     plugin :not_found
     plugin :error_handler
-    plugin :render, :escape=>true
+    plugin :render, :escape=>true, :cache=>ENV['RACK_ENV'] != 'development'
     plugin :assets,
       :css=>%w'bootstrap.min.css application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},

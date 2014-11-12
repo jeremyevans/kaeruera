@@ -1,8 +1,9 @@
 .error-info {
-  width: 960px;
-  .key { width: 200px; }
+  width: auto;
+  .key { width: 250px; }
   .value { width: 700px; }
-  td, th {
+  tbody tr td, thead tr th {
+    border-width: 0;
     display: inline-block;
     white-space: pre-wrap;  
     word-wrap: break-word;
@@ -15,9 +16,25 @@ table caption {
   padding: 5px;
 }
 
-label {
-  display: inline;
-  margin-right: 5px;
-}
+label { display: inline; }
 
 input, textarea, select { width: auto; }
+
+form.forme {
+  label {
+    display: inline-block;
+    min-width: 200px;
+  }
+}
+
+.navbar-default {
+  .navbar-form {
+    padding: 0;
+    border-width: 0;
+    margin-right: 20px;
+  }
+  input {
+    width: auto;
+    margin: auto;
+  }
+}

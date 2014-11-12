@@ -46,8 +46,8 @@
     <% @errors.each do |e| %>
       <%== f.input(:hidden, :name=>'ids[]', :value=>e.id) unless e.closed %>
     <% end %>
-    <div class="span8"><%== f.input(:textarea, :name=>:notes, :id=>:notes, :label=>'Notes', :cols=>80, :rows=>6) %></div>
-    <div class="span4"><%== f.input(:checkbox, :no_hidden=>true, :value=>'1', :name=>'close', :id=>'close', :label=>'Close Errors?', :obj=>nil) %><br /><br />
+    <div class="col-md-8"><%== f.input(:textarea, :name=>:notes, :id=>:notes, :label=>'Notes', :cols=>80, :rows=>6) %></div>
+    <div class="col-md-4"><%== f.input(:checkbox, :no_hidden=>true, :value=>'1', :name=>'close', :id=>'close', :label=>'Close Errors?', :obj=>nil) %><br /><br />
     <%== f.button(:class=>'btn btn-primary', :value=>'Update Errors') %></div>
   <% end %>
 <% end %>

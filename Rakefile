@@ -89,7 +89,6 @@ namespace :assets do
   desc "Precompile the assets"
   task :precompile do
     require './kaeruera_app'
-    Dir.mkdir('public') unless File.directory?('public')
     KaeruEra::App.compile_assets
   end
 end
