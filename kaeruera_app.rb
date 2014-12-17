@@ -46,6 +46,7 @@ module KaeruEra
     plugin :forme
     plugin :symbol_matchers
     plugin :symbol_views
+    plugin :static_path_info
 
     Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
     Forme.default_config = :mine
