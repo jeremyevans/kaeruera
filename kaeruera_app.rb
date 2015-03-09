@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'roda'
 require './models'
-require 'rack/protection'
+require 'rack/indifferent'
 $: << './lib'
 require 'kaeruera/database_reporter'
 
@@ -25,9 +25,7 @@ module KaeruEra
 
     use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
     plugin :csrf, :skip => ['POST:/report_error']
-    use Rack::Protection
 
-    plugin :indifferent_params
     plugin :not_found
     plugin :error_handler
     plugin :render, :escape=>true, :cache=>ENV['RACK_ENV'] != 'development'
@@ -46,6 +44,8 @@ module KaeruEra
     plugin :forme
     plugin :symbol_matchers
     plugin :symbol_views
+    plugin :delegate
+    request_delegate :params
 
     Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
     Forme.default_config = :mine
