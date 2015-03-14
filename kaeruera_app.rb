@@ -270,6 +270,4 @@ module KaeruEra
       end
     end
   end
- 
-  freeze
 end
