@@ -7,6 +7,8 @@ require 'kaeruera/reporter'
 require 'kaeruera/async_reporter'
 require 'spec/shared_lib_spec'
 
+require 'spec/spec_helper'
+
 [:errors, :applications, :users].each{|t| DB[t].delete}
 user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')
 application_id = DB[:applications].insert(:user_id=>user_id, :name=>'app', :token=>'1')

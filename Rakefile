@@ -3,18 +3,31 @@ require "rake"
 # Specs
 
 begin
+  begin
+    raise LoadError if ENV['RSPEC1']
+    # RSpec 2+
+    require "rspec/core/rake_task"
+    spec_class = RSpec::Core::RakeTask
+    spec_files_meth = :pattern=
+  rescue LoadError
+    # RSpec 1
+    require "spec/rake/spectask"
+    spec_class = Spec::Rake::SpecTask
+    spec_files_meth = :spec_files=
+  end
+
   require "spec/rake/spectask"
 
   task :default=>[:database_reporter_spec, :reporter_spec, :model_spec, :web_spec]
 
   desc "Run model specs"
-  Spec::Rake::SpecTask.new("model_spec") do |t|
-    t.spec_files = ["spec/model_spec.rb"]
+  spec_class.new("model_spec") do |t|
+    t.send spec_files_meth, ["spec/model_spec.rb"]
   end
 
   desc "Run database_reporter specs"
-  Spec::Rake::SpecTask.new("database_reporter_spec") do |t|
-    t.spec_files = ["spec/database_reporter_spec.rb"]
+  spec_class.new("database_reporter_spec") do |t|
+    t.send spec_files_meth, ["spec/database_reporter_spec.rb"]
   end
 
   desc "Run reporter specs"
@@ -22,15 +35,19 @@ begin
     sh %{echo > spec/unicorn.test.log}
     begin
       sh %{#{FileUtils::RUBY} -S unicorn -c spec/unicorn.test.conf -D config.ru}
-      sh %{#{FileUtils::RUBY} -S spec spec/reporter_spec.rb}
+      Rake::Task['_reporter_spec'].invoke
     ensure
       sh %{kill `cat spec/unicorn.test.pid`}
     end
   end
 
+  spec_class.new("_reporter_spec") do |t|
+    t.send spec_files_meth, ["spec/reporter_spec.rb"]
+  end
+
   desc "Run web specs"
-  Spec::Rake::SpecTask.new("web_spec") do |t|
-    t.spec_files = ["spec/web_spec.rb"]
+  spec_class.new("web_spec") do |t|
+    t.send spec_files_meth, ["spec/web_spec.rb"]
   end
 rescue LoadError
 end

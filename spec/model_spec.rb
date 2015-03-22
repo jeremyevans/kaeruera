@@ -3,13 +3,8 @@ ENV['RACK_ENV'] = 'test'
 $: << File.dirname(File.dirname(__FILE__))
 require 'models'
 
-class Spec::Example::ExampleGroup
-  def execute(*args, &block)
-    x = nil
-    DB.transaction{x = super(*args, &block); raise Sequel::Rollback}
-    x
-  end
-end
+TRANSACTIONAL_TESTS = true
+require 'spec/spec_helper'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 raise 'foo' rescue User.create(:email=>'ke', :password=>'secret').

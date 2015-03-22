@@ -5,13 +5,8 @@ require 'db'
 require 'lib/kaeruera/database_reporter'
 require 'spec/shared_lib_spec'
 
-class Spec::Example::ExampleGroup
-  def execute(*args, &block)
-    x = nil
-    DB.transaction{x = super(*args, &block); raise Sequel::Rollback}
-    x
-  end
-end
+TRANSACTIONAL_TESTS = true
+require 'spec/spec_helper'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')

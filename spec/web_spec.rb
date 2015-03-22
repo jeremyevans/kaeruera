@@ -6,6 +6,9 @@ require 'capybara/rspec/matchers'
 require 'rack/test'
 
 $: << File.dirname(File.dirname(__FILE__))
+TRANSACTIONAL_TESTS = true
+RESET_DRIVER = true
+require 'spec/spec_helper'
 require 'models'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
@@ -23,22 +26,15 @@ require 'kaeruera_app'
 
 Capybara.app = KaeruEra::App
 
-class Spec::Example::ExampleGroup
+class RSPEC_EXAMPLE_GROUP
   include Rack::Test::Methods
   include Capybara::DSL
   include Capybara::RSpecMatchers
+
+  def all(*a)
+    page.all(*a)
+  end
   
-  def execute(*args, &block)
-    x = nil
-    DB.transaction{x = super(*args, &block); raise Sequel::Rollback}
-    x
-  end
-
-  after do
-    Capybara.reset_sessions!
-    Capybara.use_default_driver
-  end
-
   def app
     KaeruEra::App
   end
@@ -261,8 +257,8 @@ describe KaeruEra do
   it "should allowing viewing reporter information for application" do
     click_link 'KaeruEraApp'
     click_link 'Reporter Info'
-    page.html.should =~ %r|KaeruEra::Reporter.new\("http://www.example.com(:80)?/report_error", \d+, "[0-9a-f]+"\)|
-    page.html.should =~ %r|KaeruEra::AsyncReporter.new\("http://www.example.com(:80)?/report_error", \d+, "[0-9a-f]+"\)|
+    page.html.should =~ %r|KaeruEra::Reporter.new\('http://www.example.com(:80)?/report_error', \d+, '[0-9a-f]+'\)|
+    page.html.should =~ %r|KaeruEra::AsyncReporter.new\('http://www.example.com(:80)?/report_error', \d+, '[0-9a-f]+'\)|
   end
 
   it "should allow creating new applications" do
