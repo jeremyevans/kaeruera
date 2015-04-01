@@ -262,7 +262,7 @@ module KaeruEra
           h[:closed] = true if params[:close] == '1'
           n = Error.
             with_user(session[:user_id]).
-            where(:id=>params[:ids].to_a.map{|x| x.to_i}, :closed=>false).
+            where(:id=>params[:ids].to_a.map(&:to_i), :closed=>false).
             update(h)
           flash[:notice] = "Updated #{n} errors"
           r.redirect("/")
