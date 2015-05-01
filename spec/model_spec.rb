@@ -19,131 +19,131 @@ user_id = User.first.id
 
 describe User do
   it "should have working associations" do
-    User.first.applications.should == Application.all
+    User.first.applications.must_equal Application.all
   end
 
   it ".login_user_id should return id of user if email/password match" do
-    User.login_user_id('ke', 'secret').should == user_id
+    User.login_user_id('ke', 'secret').must_equal user_id
   end
 
   it ".login_user_id should return nil if email/password do not match" do
-    User.login_user_id('k', 'secret').should == nil
-    User.login_user_id('ke', 'secret1').should == nil
+    User.login_user_id('k', 'secret').must_equal nil
+    User.login_user_id('ke', 'secret1').must_equal nil
   end
 
   it "#password= should change the user's password" do
     u = User.first
     u.password = 'foo'
     u.save
-    User.login_user_id('ke', 'foo').should == user_id
+    User.login_user_id('ke', 'foo').must_equal user_id
   end
 end
 
 describe Application do
   it "should have working associations" do
     a = Application.first
-    a.user.should == User.first
-    a.app_errors.should == Error.all
+    a.user.must_equal User.first
+    a.app_errors.must_equal Error.all
   end
 
   it ".with_user should return applications for given user id" do
-    Application.with_user(0).all.should == []
-    Application.with_user(user_id).all.should == Application.all
+    Application.with_user(0).all.must_equal []
+    Application.with_user(user_id).all.must_equal Application.all
   end
 
   it "should have token set when saving" do
-    Application.first.token.should =~ /\A[a-f0-9]{40}\z/
+    Application.first.token.must_match /\A[a-f0-9]{40}\z/
   end
 end
 
 describe Error do
   it "should have working associations" do
-    Error.first.application.should == Application.first
+    Error.first.application.must_equal Application.first
   end
 
   it ".search should search by user" do
-    Error.search({}, user_id).all.should == Error.all
-    Error.search({}, 0).all.should == []
+    Error.search({}, user_id).all.must_equal Error.all
+    Error.search({}, 0).all.must_equal []
   end
 
   it ".search should search by application" do
-    Error.search({:application=>Application.first.id.to_s}, user_id).all.should == Error.all
-    Error.search({:application=>'0'}, user_id).all.should == []
+    Error.search({:application=>Application.first.id.to_s}, user_id).all.must_equal Error.all
+    Error.search({:application=>'0'}, user_id).all.must_equal []
   end
 
   it ".search should search by error class" do
-    Error.search({:class=>Error.first.error_class}, user_id).all.should == Error.all
-    Error.search({:class=>'0'}, user_id).all.should == []
+    Error.search({:class=>Error.first.error_class}, user_id).all.must_equal Error.all
+    Error.search({:class=>'0'}, user_id).all.must_equal []
   end
 
   it ".search should search by error message" do
-    Error.search({:message=>Error.first.message}, user_id).all.should == Error.all
-    Error.search({:message=>'0'}, user_id).all.should == []
+    Error.search({:message=>Error.first.message}, user_id).all.must_equal Error.all
+    Error.search({:message=>'0'}, user_id).all.must_equal []
   end
 
   it ".search should search by status" do
-    Error.search({:closed=>'0'}, user_id).all.should == Error.all
-    Error.search({:closed=>'1'}, user_id).all.should == []
+    Error.search({:closed=>'0'}, user_id).all.must_equal Error.all
+    Error.search({:closed=>'1'}, user_id).all.must_equal []
   end
 
   it ".search should search by backtrace" do
-    Error.search({:backtrace=>Error.first.backtrace.first}, user_id).all.should == Error.all
-    Error.search({:backtrace=>'0'}, user_id).all.should == []
+    Error.search({:backtrace=>Error.first.backtrace.first}, user_id).all.must_equal Error.all
+    Error.search({:backtrace=>'0'}, user_id).all.must_equal []
   end
 
   it ".search should search by env key" do
-    Error.search({:env_key=>'grapes'}, user_id).all.should == Error.all
-    Error.search({:env_key=>'foo'}, user_id).all.should == []
+    Error.search({:env_key=>'grapes'}, user_id).all.must_equal Error.all
+    Error.search({:env_key=>'foo'}, user_id).all.must_equal []
   end
 
   it ".search should search by env key and value" do
-    Error.search({:env_key=>'grapes', :env_value=>'watermelon'}, user_id).all.should == Error.all
-    Error.search({:env_key=>'grapes', :env_value=>'foo'}, user_id).all.should == []
+    Error.search({:env_key=>'grapes', :env_value=>'watermelon'}, user_id).all.must_equal Error.all
+    Error.search({:env_key=>'grapes', :env_value=>'foo'}, user_id).all.must_equal []
   end
 
   it ".search should search by params" do
-    Error.search({:params=>'banana'}, user_id).all.should == Error.all
-    Error.search({:params=>'foo'}, user_id).all.should == []
+    Error.search({:params=>'banana'}, user_id).all.must_equal Error.all
+    Error.search({:params=>'foo'}, user_id).all.must_equal []
   end
 
   it ".search should search by session" do
-    Error.search({:session=>'pear'}, user_id).all.should == Error.all
-    Error.search({:session=>'foo'}, user_id).all.should == []
+    Error.search({:session=>'pear'}, user_id).all.must_equal Error.all
+    Error.search({:session=>'foo'}, user_id).all.must_equal []
   end
 
   it ".search should search by time occurred" do
     today = Date.today.to_s
     tomorrow = (Date.today+1).to_s
-    Error.search({:occurred_after=>today}, user_id).all.should == Error.all
-    Error.search({:occurred_after=>tomorrow}, user_id).all.should == []
-    Error.search({:occurred_before=>tomorrow}, user_id).all.should == Error.all
-    Error.search({:occurred_before=>today}, user_id).all.should == []
-    Error.search({:occurred_after=>today, :occurred_before=>tomorrow}, user_id).all.should == Error.all
-    Error.search({:occurred_after=>today, :occurred_before=>today}, user_id).all.should == []
-    Error.search({:occurred_after=>tomorrow, :occurred_before=>today}, user_id).all.should == []
+    Error.search({:occurred_after=>today}, user_id).all.must_equal Error.all
+    Error.search({:occurred_after=>tomorrow}, user_id).all.must_equal []
+    Error.search({:occurred_before=>tomorrow}, user_id).all.must_equal Error.all
+    Error.search({:occurred_before=>today}, user_id).all.must_equal []
+    Error.search({:occurred_after=>today, :occurred_before=>tomorrow}, user_id).all.must_equal Error.all
+    Error.search({:occurred_after=>today, :occurred_before=>today}, user_id).all.must_equal []
+    Error.search({:occurred_after=>tomorrow, :occurred_before=>today}, user_id).all.must_equal []
   end
 
   it ".most_recent should most recent errors" do
-    Error.most_recent.first.should == Error.first
+    Error.most_recent.first.must_equal Error.first
     raise 'foo' rescue (Application.first.add_app_error(:error_class=>$!.class, :message=>$!.message, :backtrace=>Sequel.pg_array($!.backtrace)))
-    Error.most_recent.first.should_not == Error.first
+    Error.most_recent.first.wont_equal Error.first
   end
 
   it ".dataset.open should return only errors that haven't been closed" do
-    Error.dataset.open.all.should == Error.all
+    Error.dataset.open.all.must_equal Error.all
     Error.dataset.update(:closed=>true)
-    Error.dataset.open.all.should == []
+    Error.dataset.open.all.must_equal []
   end
 
   it ".with_user should return errors for given user id" do
-    Error.with_user(0).all.should == []
-    Error.with_user(user_id).all.should == Error.all
+    Error.with_user(0).all.must_equal []
+    Error.with_user(user_id).all.must_equal Error.all
   end
 
   it "#status should state whether the error is open or closed" do
     e = Error.first
-    e.status.should == 'Open'
+    e.status.must_equal 'Open'
     e.closed = true
-    e.status.should == 'Closed'
+    e.status.must_equal 'Closed'
   end
 end

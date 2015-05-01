@@ -15,6 +15,6 @@ gem 'unicorn'
 gem 'rack_csrf'
 
 group :development, :test do
-  gem 'rspec', '>=1.3'
+  gem 'minitest'
   gem 'capybara', '>=2.1.0'
 end

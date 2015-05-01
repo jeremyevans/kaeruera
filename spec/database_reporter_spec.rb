@@ -3,36 +3,40 @@ ENV['RACK_ENV'] = 'test'
 $: << File.dirname(File.dirname(__FILE__))
 require 'db'
 require 'lib/kaeruera/database_reporter'
-require 'spec/shared_lib_spec'
 
 TRANSACTIONAL_TESTS = true
 require 'spec/spec_helper'
+require 'spec/shared_lib_spec'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
-user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')
-application_id = DB[:applications].insert(:user_id=>user_id, :name=>'app', :token=>'1')
 
 describe KaeruEra::DatabaseReporter do
   before(:all) do
+    user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')
+    application_id = DB[:applications].insert(:user_id=>user_id, :name=>'app', :token=>'1')
     @reporter = KaeruEra::DatabaseReporter.new(DB, 'ke', 'app')
     @application_id = application_id
   end
 
-  it_should_behave_like "kaeruera libs"
-end
-
-describe KaeruEra::DatabaseReporter do
-  after(:all) do
-    DB[:errors].delete
-  end
-
-  it "should accept connection string in addition to database object" do
-    reporter = KaeruEra::DatabaseReporter.new(DB.uri, 'ke', 'app')
-    raise 'foo' rescue (reporter.report.should == DB[:errors].max(:id))
-  end if DB.uri && DB.opts[:orig_opts].empty?
+  include KaeruEraLibs
 
   it "should raise ArgumentError if the application cannot be located" do
-    proc{KaeruEra::DatabaseReporter.new(DB, 'k', 'app')}.should raise_error(KaeruEra::DatabaseReporter::Error)
-    proc{KaeruEra::DatabaseReporter.new(DB, 'ke', 'ap')}.should raise_error(KaeruEra::DatabaseReporter::Error)
+    proc{KaeruEra::DatabaseReporter.new(DB, 'k', 'app')}.must_raise(KaeruEra::DatabaseReporter::Error)
+    proc{KaeruEra::DatabaseReporter.new(DB, 'ke', 'ap')}.must_raise(KaeruEra::DatabaseReporter::Error)
+  end
+
+  describe KaeruEra::DatabaseReporter do
+    def around_all
+      yield
+    end
+
+    def after_all
+      [:errors, :applications, :users].each{|t| DB[t].delete}
+    end
+
+    it "should accept connection string in addition to database object" do
+      reporter = KaeruEra::DatabaseReporter.new(DB.uri, 'ke', 'app')
+      raise 'foo' rescue (reporter.report.must_equal DB[:errors].max(:id))
+    end if DB.uri && DB.opts[:orig_opts].empty?
   end
 end

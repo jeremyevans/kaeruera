@@ -1,4 +1,4 @@
-require 'sequel'
+require 'sequel' unless defined?(Sequel)
 
 module KaeruEra
   # Reporter class that inserts the error information directly

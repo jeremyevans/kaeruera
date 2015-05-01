@@ -5,9 +5,9 @@ $: << File.join(File.dirname(File.dirname(__FILE__)), 'lib')
 require 'db'
 require 'kaeruera/reporter'
 require 'kaeruera/async_reporter'
-require 'spec/shared_lib_spec'
 
 require 'spec/spec_helper'
+require 'spec/shared_lib_spec'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')
@@ -23,7 +23,7 @@ describe KaeruEra::Reporter do
     DB[:errors].delete
   end
 
-  it_should_behave_like "kaeruera libs"
+  include KaeruEraLibs
 end
 
 describe KaeruEra::AsyncReporter do
@@ -44,5 +44,5 @@ describe KaeruEra::AsyncReporter do
     DB[:errors].delete
   end
 
-  it_should_behave_like "kaeruera libs"
+  include KaeruEraLibs
 end

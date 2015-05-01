@@ -2,54 +2,32 @@ require "rake"
 
 # Specs
 
-begin
+task :default=>[:database_reporter_spec, :reporter_spec, :model_spec, :web_spec]
+
+desc "Run model specs"
+task :model_spec do
+  sh "#{FileUtils::RUBY} -rubygems spec/model_spec.rb"
+end
+
+desc "Run database_reporter specs"
+task :database_reporter_spec do
+  sh "#{FileUtils::RUBY} -rubygems spec/database_reporter_spec.rb"
+end
+
+desc "Run reporter specs"
+task "reporter_spec" do |t|
+  sh %{echo > spec/unicorn.test.log}
   begin
-    raise LoadError if ENV['RSPEC1']
-    # RSpec 2+
-    require "rspec/core/rake_task"
-    spec_class = RSpec::Core::RakeTask
-    spec_files_meth = :pattern=
-  rescue LoadError
-    # RSpec 1
-    require "spec/rake/spectask"
-    spec_class = Spec::Rake::SpecTask
-    spec_files_meth = :spec_files=
+    sh %{#{FileUtils::RUBY} -S unicorn -c spec/unicorn.test.conf -D config.ru}
+    sh "#{FileUtils::RUBY} -rubygems spec/reporter_spec.rb"
+  ensure
+    sh %{kill `cat spec/unicorn.test.pid`}
   end
+end
 
-  require "spec/rake/spectask"
-
-  task :default=>[:database_reporter_spec, :reporter_spec, :model_spec, :web_spec]
-
-  desc "Run model specs"
-  spec_class.new("model_spec") do |t|
-    t.send spec_files_meth, ["spec/model_spec.rb"]
-  end
-
-  desc "Run database_reporter specs"
-  spec_class.new("database_reporter_spec") do |t|
-    t.send spec_files_meth, ["spec/database_reporter_spec.rb"]
-  end
-
-  desc "Run reporter specs"
-  task "reporter_spec" do |t|
-    sh %{echo > spec/unicorn.test.log}
-    begin
-      sh %{#{FileUtils::RUBY} -S unicorn -c spec/unicorn.test.conf -D config.ru}
-      Rake::Task['_reporter_spec'].invoke
-    ensure
-      sh %{kill `cat spec/unicorn.test.pid`}
-    end
-  end
-
-  spec_class.new("_reporter_spec") do |t|
-    t.send spec_files_meth, ["spec/reporter_spec.rb"]
-  end
-
-  desc "Run web specs"
-  spec_class.new("web_spec") do |t|
-    t.send spec_files_meth, ["spec/web_spec.rb"]
-  end
-rescue LoadError
+desc "Run web specs"
+task :web_spec do
+  sh "#{FileUtils::RUBY} -rubygems spec/web_spec.rb"
 end
 
 # Migrations
