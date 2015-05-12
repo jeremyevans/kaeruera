@@ -12,7 +12,8 @@ GEM
     json (1.8.1)
     kgio (2.9.2)
     mime-types (2.4.3)
-    minitest (5.4.3)
+    minitest (5.6.1)
+    minitest-hooks (1.1.0)
     nokogiri (1.6.3.1)
     pg (0.18.0)
     rack (1.6.0)
@@ -46,6 +47,7 @@ DEPENDENCIES
   forme (>= 1.0.0)
   json
   minitest
+  minitest-hooks (>= 1.1.0)
   pg
   rack-indifferent
   rack_csrf

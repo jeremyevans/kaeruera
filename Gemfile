@@ -16,5 +16,6 @@ gem 'rack_csrf'
 
 group :development, :test do
   gem 'minitest'
+  gem 'minitest-hooks', '>= 1.1.0'
   gem 'capybara', '>=2.1.0'
 end

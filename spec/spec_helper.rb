@@ -4,12 +4,12 @@ require 'minitest/hooks/default'
 
 class Minitest::HooksSpec
   if defined?(TRANSACTIONAL_TESTS)
-    def around_all
-      DB.transaction(:rollback=>:always){yield}
+    around(:all) do |&block|
+      DB.transaction(:rollback=>:always){super(&block)}
     end
 
-    def around
-      DB.transaction(:rollback=>:always, :savepoint=>true){yield}
+    around do |&block|
+      DB.transaction(:rollback=>:always, :savepoint=>true){super(&block)}
     end
   end
 
