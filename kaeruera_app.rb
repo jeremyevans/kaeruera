@@ -5,6 +5,12 @@ require 'rack/indifferent'
 $: << './lib'
 require 'kaeruera/database_reporter'
 
+begin
+  require 'tilt/erubis'
+rescue LoadError
+  require 'tilt/erb'
+end
+
 module KaeruEra
   class App < Roda
     # The reporter used for reporting internal errors.  Defaults to the same database
