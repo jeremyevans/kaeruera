@@ -22,20 +22,12 @@ describe User do
     User.first.applications.must_equal Application.all
   end
 
-  it ".login_user_id should return id of user if email/password match" do
-    User.login_user_id('ke', 'secret').must_equal user_id
-  end
-
-  it ".login_user_id should return nil if email/password do not match" do
-    User.login_user_id('k', 'secret').must_equal nil
-    User.login_user_id('ke', 'secret1').must_equal nil
-  end
-
   it "#password= should change the user's password" do
     u = User.first
     u.password = 'foo'
     u.save
-    User.login_user_id('ke', 'foo').must_equal user_id
+    u.refresh
+    BCrypt::Password.new(u.refresh.password_hash).must_be :==, 'foo'
   end
 end
 

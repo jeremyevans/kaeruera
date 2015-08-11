@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    bcrypt-ruby (3.0.1)
+    bcrypt (3.1.10)
     capybara (2.4.4)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -9,26 +9,35 @@ GEM
       rack-test (>= 0.5.4)
     erubis (2.7.0)
     forme (1.3.0)
-    json (1.8.1)
+    json (1.8.3)
     kgio (2.9.2)
-    mime-types (2.4.3)
-    minitest (5.6.1)
+    mail (2.6.3)
+      mime-types (>= 1.16, < 3)
+    mime-types (2.6.1)
+    minitest (5.7.0)
     minitest-hooks (1.1.0)
     nokogiri (1.6.3.1)
     pg (0.18.0)
-    rack (1.6.0)
+    rack (1.6.2)
     rack-indifferent (1.1.0)
       rack (>= 1.5)
-    rack-test (0.6.2)
+    rack-test (0.6.3)
       rack (>= 1.0)
     rack_csrf (2.5.0)
       rack (>= 1.1.0)
     raindrops (0.10.0)
-    roda (2.2.0)
+    roda (2.5.1)
       rack
+    rodauth (0.9.1)
+      bcrypt
+      mail
+      rack_csrf
+      roda (>= 2)
+      sequel (>= 4)
+      tilt
     sass (3.4.9)
-    sequel (4.22.0)
-    sequel_pg (1.6.12)
+    sequel (4.25.0)
+    sequel_pg (1.6.13)
       pg (>= 0.8.0)
       sequel (>= 3.39.0)
     tilt (2.0.1)
@@ -41,7 +50,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bcrypt-ruby
+  bcrypt
   capybara (>= 2.1.0)
   erubis
   forme (>= 1.0.0)
@@ -52,6 +61,7 @@ DEPENDENCIES
   rack-indifferent
   rack_csrf
   roda (>= 1.2.0)
+  rodauth
   sass
   sequel
   sequel_pg

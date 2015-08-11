@@ -52,11 +52,11 @@ describe KaeruEra do
     fill_in 'email', :with=>'k'
     fill_in 'password', :with=>'secret'
     click_on 'Login'
-    page.html.must_match /No matching email\/password/
-    fill_in 'email', :with=>'ke'
+    page.html.must_match /no matching login/
+    fill_in 'email', :with=>'kaeruera'
     fill_in 'password', :with=>'secet'
     click_on 'Login'
-    page.html.must_match /No matching email\/password/
+    page.html.must_match /invalid password/
   end
 end
 
@@ -66,7 +66,7 @@ describe KaeruEra do
   end
 
   it "should be able to logout" do
-    page.html.must_match /Logged In/
+    page.html.must_match /You have been logged in/
     click_button 'Logout'
     page.current_path.must_equal '/login'
     click_link 'KaeruEra'
@@ -239,18 +239,19 @@ describe KaeruEra do
 
   it "should allowing changing passwords" do
     click_link 'Change Password'
-    fill_in 'New Password', :with=>'something'
+    fill_in 'Password', :with=>'something'
+    fill_in 'Confirm Password', :with=>'something'
     click_button 'Change Password'
-    page.html.must_match /Password Changed/
+    page.html.must_match /Your password has been changed/
 
     click_button 'Logout'
     login
-    page.html.must_match /No matching email\/password/
+    page.html.must_match /invalid password/
 
     fill_in 'email', :with=>'kaeruera'
     fill_in 'password', :with=>'something'
     click_on 'Login'
-    page.html.must_match /Logged In/
+    page.html.must_match /You have been logged in/
   end
 
   it "should allowing viewing reporter information for application" do

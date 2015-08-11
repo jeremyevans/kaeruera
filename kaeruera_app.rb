@@ -134,31 +134,24 @@ module KaeruEra
       view(:content=>"Sorry, an error occurred")
     end
 
+    plugin :rodauth do
+      enable :login, :logout, :change_password
+      session_key :user_id
+      login_param 'email'
+      login_label 'Email'
+      login_column :email
+      account_model User
+      skip_status_checks? true
+      account_password_hash_column :password_hash
+      title_instance_variable :@title
+      if DEMO_MODE
+        before_change_password{r.halt(404)}
+      end
+    end
+
     route do |r|
       r.assets
-
-      r.is 'login' do
-        r.get do
-          :login
-        end
-
-        r.post do
-          if i = User.login_user_id(params[:email].to_s, params[:password].to_s)
-            session[:user_id] = i
-            flash[:notice] = "Logged In"
-            r.redirect('/')
-          else
-            flash[:error] = "No matching email/password"
-            r.redirect
-          end
-        end
-      end
-      
-      r.post 'logout' do
-        session.clear
-        flash[:notice] = "Logged Out"
-        r.redirect '/login'
-      end
+      r.rodauth
 
       r.post 'report_error' do
         params = JSON.parse(request.body.read)
@@ -189,22 +182,6 @@ module KaeruEra
       # Force users to login before using the site, except for error
       # reporting (which uses the application's token).
       r.redirect('/login') unless session[:user_id]
-
-      unless DEMO_MODE
-        r.is 'change_password' do
-          r.get do
-            :change_password
-          end
-
-          r.post do
-            user = User.with_pk!(session[:user_id])
-            user.password = params[:password].to_s
-            user.save
-            flash[:notice] = "Password Changed"
-            r.redirect('/')
-          end
-        end
-      end
 
       r.is 'add_application' do
         r.get do
