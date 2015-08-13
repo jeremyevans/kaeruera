@@ -29,6 +29,7 @@ module KaeruEra
       DEMO_MODE = false
     end
 
+    use Rack::CommonLogger if ENV['RACK_ENV'] == 'test'
     use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
     plugin :csrf, :skip => ['POST:/report_error']
 
