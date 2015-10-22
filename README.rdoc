@@ -24,7 +24,7 @@ about the error.
 
 == Demo
 
-* URL: http://kaeruera.jeremyevans.net
+* URL: http://kaeruera-demo.jeremyevans.net
 * Login Email: demo
 * Login Password: demo
 
