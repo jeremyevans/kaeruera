@@ -141,8 +141,7 @@ module KaeruEra
       login_param 'email'
       login_label 'Email'
       login_column :email
-      account_model User
-      skip_status_checks? true
+      accounts_table :users
       account_password_hash_column :password_hash
       title_instance_variable :@title
       if DEMO_MODE

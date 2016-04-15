@@ -239,7 +239,8 @@ describe KaeruEra do
 
   it "should allowing changing passwords" do
     click_link 'Change Password'
-    fill_in 'Password', :with=>'something'
+    fill_in 'Password', :with=>'secret'
+    fill_in 'New Password', :with=>'something'
     fill_in 'Confirm Password', :with=>'something'
     click_button 'Change Password'
     page.html.must_match /Your password has been changed/
