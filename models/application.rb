@@ -26,3 +26,19 @@ class Application < Sequel::Model
     super
   end
 end
+
+# Table: applications
+# Columns:
+#  id      | integer | PRIMARY KEY DEFAULT nextval('applications_id_seq'::regclass)
+#  user_id | integer | NOT NULL
+#  name    | text    | NOT NULL
+#  token   | text    | NOT NULL
+# Indexes:
+#  applications_pkey             | PRIMARY KEY btree (id)
+#  applications_user_id_id_key   | UNIQUE btree (user_id, id)
+#  applications_user_id_name_key | UNIQUE btree (user_id, name)
+# Foreign key constraints:
+#  applications_user_id_fkey | (user_id) REFERENCES users(id)
+# Referenced By:
+#  errors | errors_application_id_fkey | (application_id) REFERENCES applications(id)
+#  errors | errors_user_id_fkey        | (user_id, application_id) REFERENCES applications(user_id, id)

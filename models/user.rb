@@ -7,3 +7,14 @@ class User < Sequel::Model
     self.password_hash = BCrypt::Password.create(new_password, :cost=>BCRYPT_COST)
   end
 end
+
+# Table: users
+# Columns:
+#  id            | integer | PRIMARY KEY DEFAULT nextval('users_id_seq'::regclass)
+#  email         | text    | NOT NULL
+#  password_hash | text    | NOT NULL
+# Indexes:
+#  users_pkey      | PRIMARY KEY btree (id)
+#  users_email_key | UNIQUE btree (email)
+# Referenced By:
+#  applications | applications_user_id_fkey | (user_id) REFERENCES users(id)
