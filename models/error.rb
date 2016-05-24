@@ -14,15 +14,17 @@ class Error < Sequel::Model
       ds = ds.where(:message=>params[:message].to_s) if params[:message] && !params[:message].empty?
       ds = ds.where(:closed=>params[:closed] == '1') if params[:closed] && !params[:closed].empty?
       ds = ds.where(Sequel.pg_array(:backtrace).contains([params[:backtrace].to_s])) if params[:backtrace] && !params[:backtrace].empty?
-      if params[:env_key] && !params[:env_key].empty?
-        ds = if params[:env_value] && !params[:env_value].empty?
-          ds.where(Sequel.hstore(:env).contains(params[:env_key].to_s=>params[:env_value].to_s))
+      if %w'env params session'.include?(type = params[:field]) && !(key = params[:key].to_s).empty?
+        param_value = params[:value].to_s
+        jsonb = Sequel.pg_jsonb(type.to_sym)
+
+        ds = if param_value.empty?
+          ds.where(jsonb.has_key?(key))
         else
-          ds.where(Sequel.hstore(:env).has_key?(params[:env_key].to_s))
+          param_value = convert_json_param_value(param_value, params[:field_type])
+          ds.where(jsonb.contains(key=>param_value))
         end
       end
-      ds = ds.full_text_search(Sequel.cast(:params, String), params[:params].to_s) if params[:params] && !params[:params].empty?
-      ds = ds.full_text_search(Sequel.cast(:session, String), params[:session].to_s) if params[:session] && !params[:session].empty?
       ds = ds.where{created_at >= params[:occurred_after].to_s} if params[:occurred_after] && !params[:occurred_after].empty?
       ds = ds.where{created_at < params[:occurred_before].to_s} if params[:occurred_before] && !params[:occurred_before].empty?
       ds
@@ -42,11 +44,39 @@ class Error < Sequel::Model
     def with_user(user_id)
       where(:user_id=>user_id)
     end
+
+    private
+
+    def convert_json_param_value(value, type)
+      case type
+      when 'i'
+        value.to_i
+      when 'b'
+        value == 'true'
+      when 'n'
+        nil
+      else
+        value
+      end
+    end
   end
 
   # String representing the status of the error (Closed/Open).
   def status
     closed ? 'Closed' : 'Open'
+  end
+
+  # An indicator used for the json type, so that the search engine can now
+  # how to convert the types.
+  def json_type_indicator(value)
+    case value
+    when Integer
+      'i'
+    when true, false
+      'b'
+    when nil
+      'n'
+    end
   end
 end
 

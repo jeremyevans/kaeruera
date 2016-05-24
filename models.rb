@@ -10,8 +10,8 @@ end
 
 require File.join(File.dirname(__FILE__), 'db')
 
-DB.extension :pg_array, :pg_hstore, :pg_json
-Sequel.extension :pg_array_ops, :pg_hstore_ops
+DB.extension :pg_array, :pg_json
+Sequel.extension :pg_array_ops, :pg_json_ops
 
 Sequel::Model.raise_on_typecast_failure = false
 Sequel::Model.plugin :auto_validations

@@ -6,10 +6,10 @@
   <%== f.input(:text, :name=>'class', :id=>'class', :label=>'Error Class') %>
   <%== f.input(:text, :name=>'message', :id=>'message', :label=>'Error Message Is') %>
   <%== f.input(:text, :name=>'backtrace', :id=>'backtrace', :label=>'Backtrace Includes Line') %>
-  <%== f.input(:text, :name=>'env_key', :id=>'env_key', :label=>'Environment Has Key') %>
-  <%== f.input(:text, :name=>'env_value', :id=>'env_value', :label=>'With Value') %>
-  <%== f.input(:text, :name=>'params', :id=>'params', :label=>'Params Contains') %>
-  <%== f.input(:text, :name=>'session', :id=>'session', :label=>'Session Contains') %>
+  <%== f.input(:select, :name=>'field', :id=>'field', :label=>'JSON Field', :options=>%w'env params session', :add_blank=>true) %>
+  <%== f.input(:text, :name=>'key', :id=>'key', :label=>'JSON Field Key') %>
+  <%== f.input(:text, :name=>'value', :id=>'value', :label=>'JSON Field Value') %>
+  <%== f.input(:select, :name=>'field_type', :id=>'field_type', :label=>'JSON Field Type', :options=>[['String', 's'], ['Integer', 'i'], ['Boolean', 'b'], ['Null', 'n']]) %>
   <%== f.input(:text, :name=>'occurred_after', :id=>'occurred_after', :label=>'Occurred On or After') %>
   <%== f.input(:text, :name=>'occurred_before', :id=>'occurred_before', :label=>'Occurred Before') %>
 <% end %>

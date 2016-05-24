@@ -11,9 +11,9 @@ raise 'foo' rescue User.create(:email=>'ke', :password=>'secret').
   add_application(:name=>'app').
   add_app_error(:error_class=>$!.class,
                 :message=>$!.message,
-                :env=>Sequel.hstore({'grapes'=>'watermelon'}),
-                :params=>Sequel.pg_json({'banana'=>'apple'}),
-                :session=>Sequel.pg_json({'pear'=>'papaya'}),
+                :env=>Sequel.pg_jsonb('grapes'=>'watermelon'),
+                :params=>Sequel.pg_jsonb('banana'=>'apple'),
+                :session=>Sequel.pg_jsonb('pear'=>'papaya'),
                 :backtrace=>Sequel.pg_array($!.backtrace))
 user_id = User.first.id
 
@@ -84,23 +84,50 @@ describe Error do
   end
 
   it ".search should search by env key" do
-    Error.search({:env_key=>'grapes'}, user_id).all.must_equal Error.all
-    Error.search({:env_key=>'foo'}, user_id).all.must_equal []
+    Error.search({:field=>'env', :key=>'grapes'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'env', :key=>'foo'}, user_id).all.must_equal []
   end
 
   it ".search should search by env key and value" do
-    Error.search({:env_key=>'grapes', :env_value=>'watermelon'}, user_id).all.must_equal Error.all
-    Error.search({:env_key=>'grapes', :env_value=>'foo'}, user_id).all.must_equal []
+    Error.search({:field=>'env', :key=>'grapes', :value=>'watermelon'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'env', :key=>'grapes', :value=>'foo'}, user_id).all.must_equal []
   end
 
-  it ".search should search by params" do
-    Error.search({:params=>'banana'}, user_id).all.must_equal Error.all
-    Error.search({:params=>'foo'}, user_id).all.must_equal []
+  it ".search should search by params key" do
+    Error.search({:field=>'params', :key=>'banana'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'params', :key=>'foo'}, user_id).all.must_equal []
   end
 
-  it ".search should search by session" do
-    Error.search({:session=>'pear'}, user_id).all.must_equal Error.all
-    Error.search({:session=>'foo'}, user_id).all.must_equal []
+  it ".search should search by params key and value" do
+    Error.search({:field=>'params', :key=>'banana', :value=>'apple'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'params', :key=>'banana', :value=>'foo'}, user_id).all.must_equal []
+  end
+
+  it ".search should search by session key" do
+    Error.search({:field=>'session', :key=>'pear'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'session', :key=>'foo'}, user_id).all.must_equal []
+  end
+
+  it ".search should search by session key and value" do
+    Error.search({:field=>'session', :key=>'pear', :value=>'papaya'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'session', :key=>'pear', :value=>'foo'}, user_id).all.must_equal []
+  end
+  it ".search should handle non-string values" do
+    Error.dataset.update(:session=>Sequel.pg_jsonb('pear'=>1))
+    Error.search({:field=>'session', :key=>'pear', :value=>'1', :field_type=>'i'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'session', :key=>'pear', :value=>'1'}, user_id).all.must_equal []
+
+    Error.dataset.update(:session=>Sequel.pg_jsonb('pear'=>true))
+    Error.search({:field=>'session', :key=>'pear', :value=>'true', :field_type=>'b'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'session', :key=>'pear', :value=>'true'}, user_id).all.must_equal []
+
+    Error.dataset.update(:session=>Sequel.pg_jsonb('pear'=>false))
+    Error.search({:field=>'session', :key=>'pear', :value=>'false', :field_type=>'b'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'session', :key=>'pear', :value=>'false'}, user_id).all.must_equal []
+
+    Error.dataset.update(:session=>Sequel.pg_jsonb('pear'=>nil))
+    Error.search({:field=>'session', :key=>'pear', :value=>'nil', :field_type=>'n'}, user_id).all.must_equal Error.all
+    Error.search({:field=>'session', :key=>'pear', :value=>'nil'}, user_id).all.must_equal []
   end
 
   it ".search should search by time occurred" do

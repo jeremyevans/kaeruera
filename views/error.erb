@@ -52,13 +52,8 @@
   <tbody>
     <% h.each do |k, v| %>
       <tr>
-        <% if type == :env %>
-          <td class="key"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%= url_escape(k)%>"><%= k %></a></td>
-          <td class="value"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;env_key=<%= url_escape(k)%>&amp;env_value=<%= url_escape(v)%>"><%= v %></a></td>
-        <% else %>
-          <td class="key"><%= k %></td>
-          <td class="value"><%= v %></td>
-        <% end %>
+        <td class="key"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;field=<%= type %>&amp;key=<%= url_escape(k) %>"><%= k %></a></td>
+        <td class="value"><a href="/search?search=Search&amp;application_id=<%= @error.application_id %>&amp;field=<%= type %>&amp;key=<%= url_escape(k) %>&amp;value=<%= url_escape(v) %>&amp;field_type=<%= @error.json_type_indicator(v) %>"><%= v.nil? ? '(null)' : v %></a></td>
       </tr>
     <% end %>
   </tbody>

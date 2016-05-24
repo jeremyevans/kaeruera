@@ -17,7 +17,7 @@ module KaeruEra
     # application :: The KaeruEra application name
     def initialize(uri, email, application)
       @db = uri.is_a?(Sequel::Database) ? uri : Sequel.connect(uri, :keep_reference=>false)
-      @db.extension :pg_array, :pg_hstore, :pg_json
+      @db.extension :pg_array, :pg_json
       @application_id, @user_id = @db[:applications].where(:user_id=>@db[:users].where(:email=>email).get(:id), :name=>application).get([:id, :user_id])
       raise(Error, "No matching application in database for #{email}/#{application}") unless @application_id
     end
@@ -41,13 +41,13 @@ module KaeruEra
       }
 
       if v = opts[:params]
-        h[:params] = Sequel.pg_json(v.to_hash)
+        h[:params] = Sequel.pg_jsonb(v.to_hash)
       end
       if v = opts[:session]
-        h[:session] = Sequel.pg_json(v.to_hash)
+        h[:session] = Sequel.pg_jsonb(v.to_hash)
       end
       if v = opts[:env]
-        h[:env] = Sequel.hstore(v.to_hash)
+        h[:env] = Sequel.pg_jsonb(v.to_hash)
       end
 
       @db[:errors].insert(h)

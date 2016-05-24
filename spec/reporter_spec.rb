@@ -12,7 +12,7 @@ require 'spec/shared_lib_spec'
 [:errors, :applications, :users].each{|t| DB[t].delete}
 user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')
 application_id = DB[:applications].insert(:user_id=>user_id, :name=>'app', :token=>'1')
-DB.extension :pg_array, :pg_hstore, :pg_json
+DB.extension :pg_array, :pg_json
 
 describe KaeruEra::Reporter do
   before(:all) do

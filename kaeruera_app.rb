@@ -167,13 +167,13 @@ module KaeruEra
         }
 
         if v = data['params']
-          h[:params] = Sequel.pg_json(v.to_hash)
+          h[:params] = Sequel.pg_jsonb(v.to_hash)
         end
         if v = data['session']
-          h['session'] = Sequel.pg_json(v.to_hash)
+          h['session'] = Sequel.pg_jsonb(v.to_hash)
         end
         if v = data['env']
-          h[:env] = Sequel.hstore(v.to_hash)
+          h[:env] = Sequel.pg_jsonb(v.to_hash)
         end
 
         {'error_id' => DB[:errors].insert(h)}

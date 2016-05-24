@@ -46,8 +46,7 @@ application multiple errors.
 In the database, each error is stored is a single row, document
 style.  This uses PostgreSQL's advanced types, storing the
 backtrace for the error as an array of text fields (text[]),
-the environment as an hstore (string key/string value hash table),
-and the params and session information as json (since they often
+the environment, params, session information as jsonb (since they
 contain nested data).  All of the error columns are indexed for
 easy searching.
 
@@ -166,21 +165,29 @@ StandardError :: an exception occurred when trying to report the error, the retu
 
 === Sinatra
 
-If the application reporting errors is running sinatra, you can probably put this in your error block
+If the application reporting errors is running Sinatra, you can probably put this in your error block
 to report errors to KaeruEra:
 
-  REPORTER.report(:params=>params, :env=>env, :session=>session, :error=>request.env['sinatra.error'])
+  REPORTER.report(:params=>params, :env=>env, :session=>session, :error=>env['sinatra.error'])
+
+=== Roda
+
+If the application reporting errors is running Roda, you can probably use an error plugin block
+similar to this to report errors to KaeruEra:
+
+  plugin :error do |e|
+    REPORTER.report(:params=>request.params, :env=>env, :session=>session, :error=>e)
+  end
 
 == Runtime Dependencies
 
 === KaeruEra::App (web server)
 
-* PostgreSQL 9.2+
+* PostgreSQL 9.4+
 * pg
-* sinatra
-* sinatra-flash
+* roda
 * sequel
-* bcrypt-ruby
+* bcrypt
 * forme
 * json
 * rack_csrf
@@ -202,7 +209,6 @@ to report errors to KaeruEra:
   heroku addons:add heroku-postgresql:dev
   heroku pg:promote HEROKU_POSTGRESQL_COLOR_URL
   git push heroku master
-  echo 'CREATE EXTENSION hstore' | heroku pg:psql
   heroku run rake production_up
   heroku config:set KAERUERA_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.hex(30)'`
   heroku run irb -r ./models
@@ -232,13 +238,6 @@ Then, create databases for the application with that user:
   createdb -U postgres -O kaeruera kaeruera_development
   createdb -U postgres -O kaeruera kaeruera_test
   createdb -U postgres -O kaeruera kaeruera_production
-
-If you don't have hstore as a default extension in your PostgreSQL
-template database, you'll have to add it:
-
-  echo 'CREATE EXTENSION hstore' | psql -U postgres kaeruera_development
-  echo 'CREATE EXTENSION hstore' | psql -U postgres kaeruera_test
-  echo 'CREATE EXTENSION hstore' | psql -U postgres kaeruera_production
 
 Then, you can migrate the database:
 
@@ -279,9 +278,10 @@ This assumes you have already created the test database and migrated the
 test database to the latest version.  The following are additional
 requirements when running tests:
 
-* Rspec 1
-* Unicorn
-* Capybara
+* minitest
+* minitest-hooks
+* unicorn
+* capybara
 
 == Naming
 

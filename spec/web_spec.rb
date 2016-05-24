@@ -16,9 +16,9 @@ raise 'foo' rescue User.create(:email=>'kaeruera', :password=>'secret').
   add_application(:name=>'KaeruEraApp').
   add_app_error(:error_class=>$!.class,
                 :message=>$!.message,
-                :env=>Sequel.hstore('grapes'=>'watermelon'),
-                :params=>Sequel.pg_json('banana'=>'apple'),
-                :session=>Sequel.pg_json('pear'=>'papaya'),
+                :env=>Sequel.pg_jsonb('grapes'=>'watermelon'),
+                :params=>Sequel.pg_jsonb('banana'=>123),
+                :session=>Sequel.pg_jsonb('pear'=>nil),
                 :backtrace=>Sequel.pg_array($!.backtrace))
 error_id = DB[:errors].max(:id).to_s
 
@@ -112,8 +112,8 @@ describe KaeruEra do
     bt[-1].must_match /<main>|spec/
 
     tables = all("#content table")
-    tables[0].all("td").map{|s| s.text}.must_equal %w'banana apple'
-    tables[1].all("td").map{|s| s.text}.must_equal %w'pear papaya'
+    tables[0].all("td").map{|s| s.text}.must_equal %w'banana 123'
+    tables[1].all("td").map{|s| s.text}.must_equal %w'pear (null)'
     tables[2].all("td").map{|s| s.text}.must_equal %w'grapes watermelon'
   end
 
@@ -183,23 +183,50 @@ describe KaeruEra do
     all('#content tr').size.must_equal 2
 
     click_link 'Search'
-    fill_in 'Environment Has Key', :with=>'grapes'
+    select 'env'
+    fill_in 'JSON Field Key', :with=>'grapes'
     click_button 'Search'
     all('#content tr').size.must_equal 2
 
     click_link 'Search'
-    fill_in 'Environment Has Key', :with=>'grapes'
-    fill_in 'With Value', :with=>'watermelon'
+    select 'env'
+    fill_in 'JSON Field Key', :with=>'grapes'
+    fill_in 'JSON Field Value', :with=>'watermelon'
     click_button 'Search'
     all('#content tr').size.must_equal 2
 
     click_link 'Search'
-    fill_in 'Params Contains', :with=>'banana'
+    select 'params'
+    fill_in 'JSON Field Key', :with=>'banana'
     click_button 'Search'
     all('#content tr').size.must_equal 2
 
     click_link 'Search'
-    fill_in 'Session Contains', :with=>'papaya'
+    select 'params'
+    fill_in 'JSON Field Key', :with=>'banana'
+    fill_in 'JSON Field Value', :with=>'123'
+    click_button 'Search'
+    all('#content tr').size.must_equal 0
+
+    click_link 'Search'
+    select 'params'
+    fill_in 'JSON Field Key', :with=>'banana'
+    fill_in 'JSON Field Value', :with=>'123'
+    select 'Integer'
+    click_button 'Search'
+    all('#content tr').size.must_equal 2
+
+    click_link 'Search'
+    select 'session'
+    fill_in 'JSON Field Key', :with=>'pear'
+    click_button 'Search'
+    all('#content tr').size.must_equal 2
+
+    click_link 'Search'
+    select 'session'
+    fill_in 'JSON Field Key', :with=>'pear'
+    fill_in 'JSON Field Value', :with=>' '
+    select 'Null'
     click_button 'Search'
     all('#content tr').size.must_equal 2
 
@@ -278,9 +305,9 @@ describe KaeruEra do
     50.times do |i|
       raise "foo#{i}" rescue a.add_app_error(:error_class=>$!.class,
                         :message=>$!.message,
-                        :env=>Sequel.hstore('grapes'=>'watermelon'),
-                        :params=>Sequel.pg_json('banana'=>'apple'),
-                        :session=>Sequel.pg_json('pear'=>'papaya'),
+                        :env=>Sequel.pg_jsonb('grapes'=>'watermelon'),
+                        :params=>Sequel.pg_jsonb('banana'=>'apple'),
+                        :session=>Sequel.pg_jsonb('pear'=>'papaya'),
                         :backtrace=>Sequel.pg_array($!.backtrace))
     end
   end
