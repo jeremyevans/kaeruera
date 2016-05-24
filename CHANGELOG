@@ -1,3 +1,7 @@
+=== 0.2.0 (2016-05-24)
+
+* Use jsonb instead of hstore/json for env/params/session (jeremyevans)
+
 === 0.1.0 (2013-07-06)
 
 * Initial Public Release

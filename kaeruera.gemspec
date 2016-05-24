@@ -1,11 +1,11 @@
 Gem::Specification.new do |s|
   s.name = 'kaeruera'
-  s.version = '0.1.0'
+  s.version = '0.2.0'
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = false
   s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "MIT-LICENSE"]
   s.rdoc_options += ["--quiet", "--line-numbers", "--inline-source", '--title', 'Reporter Libraries for KaeruEra', '--main', 'README.rdoc']
-  s.summary = "Faster SELECTs when using Sequel with pg"
+  s.summary = "Reporter Libraries for KaeruEra"
   s.author = "Jeremy Evans"
   s.email = "code@jeremyevans.net"
   s.homepage = "http://github.com/jeremyevans/kaeruera"
