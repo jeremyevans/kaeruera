@@ -90,9 +90,9 @@ end
 #  error_class    | text                        | NOT NULL
 #  message        | text                        | NOT NULL
 #  backtrace      | text[]                      | NOT NULL
-#  env            | hstore                      |
-#  params         | json                        |
-#  session        | json                        |
+#  env            | jsonb                       |
+#  params         | jsonb                       |
+#  session        | jsonb                       |
 #  notes          | text                        |
 # Indexes:
 #  errors_pkey                 | PRIMARY KEY btree (id)
@@ -100,11 +100,11 @@ end
 #  errors_backtrace_index      | gin (backtrace)
 #  errors_closed_index         | btree (closed)
 #  errors_created_at_index     | btree (created_at)
-#  errors_env_index            | gist (env)
+#  errors_env_index            | gin (env)
 #  errors_error_class_index    | btree (error_class)
 #  errors_message_index        | btree (message)
-#  errors_params_index         | gist (to_tsvector('simple'::regconfig, COALESCE(params::text, ''::text)))
-#  errors_session_index        | gist (to_tsvector('simple'::regconfig, COALESCE(session::text, ''::text)))
+#  errors_params_index         | gin (params)
+#  errors_session_index        | gin (session)
 # Foreign key constraints:
 #  errors_application_id_fkey | (application_id) REFERENCES applications(id)
 #  errors_user_id_fkey        | (user_id, application_id) REFERENCES applications(user_id, id)
