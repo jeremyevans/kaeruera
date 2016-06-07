@@ -8,6 +8,8 @@ TRANSACTIONAL_TESTS = true
 require 'spec/spec_helper'
 require 'spec/shared_lib_spec'
 
+include KaeruEra
+
 [:errors, :applications, :users].each{|t| DB[t].delete}
 
 describe KaeruEra::DatabaseReporter do

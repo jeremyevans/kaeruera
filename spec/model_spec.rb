@@ -2,6 +2,7 @@ require 'rubygems'
 ENV['RACK_ENV'] = 'test'
 $: << File.dirname(File.dirname(__FILE__))
 require 'models'
+include KaeruEra
 
 TRANSACTIONAL_TESTS = true
 require 'spec/spec_helper'

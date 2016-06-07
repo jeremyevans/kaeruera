@@ -1,7 +1,8 @@
+module KaeruEra
 # Represents an application which will be reporting errors to KaeruEra.
-class Application < Sequel::Model
+class Application < Sequel::Model(DB)
   many_to_one :user
-  one_to_many :app_errors, :class=>:Error
+  one_to_many :app_errors, :class=>"KaeruEra::Error"
 
   dataset_module do
     # Dataset method restricting application to those with the given user id.
@@ -25,6 +26,7 @@ class Application < Sequel::Model
     error.user_id = user_id
     super
   end
+end
 end
 
 # Table: applications

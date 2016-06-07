@@ -6,6 +6,8 @@ require 'db'
 require 'kaeruera/reporter'
 require 'kaeruera/async_reporter'
 
+include KaeruEra
+
 require 'spec/spec_helper'
 require 'spec/shared_lib_spec'
 

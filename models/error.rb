@@ -1,6 +1,7 @@
+module KaeruEra
 # Represents a specific ruby exception raised by an application which
 # is reporting errors to KaeruEra.
-class Error < Sequel::Model
+class Error < Sequel::Model(DB)
   many_to_one :application
 
   dataset_module do
@@ -78,6 +79,7 @@ class Error < Sequel::Model
       'n'
     end
   end
+end
 end
 
 # Table: errors

@@ -10,6 +10,7 @@ TRANSACTIONAL_TESTS = true
 RESET_DRIVER = true
 require 'spec/spec_helper'
 require 'models'
+include KaeruEra
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 raise 'foo' rescue User.create(:email=>'kaeruera', :password=>'secret').

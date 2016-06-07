@@ -1,9 +1,8 @@
 require 'rubygems'
 require 'roda'
-require './models'
 require 'rack/indifferent'
-$: << './lib'
-require 'kaeruera/database_reporter'
+require ::File.expand_path('../models',  __FILE__)
+require ::File.expand_path('../lib/kaeruera/database_reporter',  __FILE__)
 
 begin
   require 'tilt/erubis'
@@ -13,6 +12,8 @@ end
 
 module KaeruEra
   class App < Roda
+    opts[:root] = File.dirname(__FILE__)
+
     # The reporter used for reporting internal errors.  Defaults to the same database
     # used to store the errors for the applications that this server tracks.  This
     # causes obvious issues if the Database for this server goes down.
@@ -35,14 +36,14 @@ module KaeruEra
 
     plugin :not_found
     plugin :error_handler
-    plugin :render, :escape=>true, :cache=>ENV['RACK_ENV'] != 'development'
+    plugin :render, :escape=>true
     plugin :assets,
       :css=>%w'bootstrap.min.css application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},
       :css_dir=>nil,
       :compiled_path=>nil,
       :compiled_css_dir=>nil,
-      :precompiled=>'compiled_assets.json',
+      :precompiled=>File.expand_path('../compiled_assets.json', __FILE__),
       :prefix=>nil
     plugin :flash
     plugin :h
@@ -136,6 +137,7 @@ module KaeruEra
     end
 
     plugin :rodauth do
+      db DB
       enable :login, :logout, :change_password
       session_key :user_id
       login_param 'email'
