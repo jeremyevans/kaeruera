@@ -1,6 +1,6 @@
 module KaeruEra
 # Separates access to applications based on specific login information.
-class User < Sequel::Model(DB)
+class User < Model
   one_to_many :applications, :order=>:name
 
   # Set the user's password hash to a bcrypt-encrypted one for the given password.

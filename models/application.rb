@@ -1,6 +1,6 @@
 module KaeruEra
 # Represents an application which will be reporting errors to KaeruEra.
-class Application < Sequel::Model(DB)
+class Application < Model
   many_to_one :user
   one_to_many :app_errors, :class=>"KaeruEra::Error"
 
