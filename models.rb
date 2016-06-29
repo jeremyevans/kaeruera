@@ -16,6 +16,7 @@ module KaeruEra
   Sequel.extension :pg_array_ops, :pg_json_ops
 
   Model = Class.new(Sequel::Model)
+  Model.db = DB
   Model.plugin :auto_validations
   Model.plugin :prepared_statements
   Model.plugin :prepared_statements_associations
