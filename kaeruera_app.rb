@@ -44,7 +44,8 @@ module KaeruEra
       :compiled_path=>nil,
       :compiled_css_dir=>nil,
       :precompiled=>File.expand_path('../compiled_assets.json', __FILE__),
-      :prefix=>nil
+      :prefix=>nil,
+      :gzip=>true
     plugin :flash
     plugin :h
     plugin :halt
