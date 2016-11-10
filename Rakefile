@@ -18,7 +18,8 @@ desc "Run reporter specs"
 task "reporter_spec" do |t|
   sh %{echo > spec/unicorn.test.log}
   begin
-    sh %{#{FileUtils::RUBY} -S unicorn -c spec/unicorn.test.conf -D config.ru}
+    unicorn_bin = File.basename(FileUtils::RUBY).sub(/\Aruby/, 'unicorn')
+    sh %{#{FileUtils::RUBY} -S #{unicorn_bin} -c spec/unicorn.test.conf -D config.ru}
     sh "#{FileUtils::RUBY} -rubygems spec/reporter_spec.rb"
   ensure
     sh %{kill `cat spec/unicorn.test.pid`}
