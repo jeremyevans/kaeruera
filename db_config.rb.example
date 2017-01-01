@@ -6,4 +6,4 @@ when 'production'
 else
   "postgres:///kaeruera_development?user=kaeruera"
 end
-KaeruEra::DB = Sequel.connect(ENV['KAERUERA_DATABASE_URL'] || ENV['DATABASE_URL'] || url)
+KaeruEra::DB = Sequel.connect(ENV['KAERUERA_DATABASE_URL'] || ENV['DATABASE_URL'] || url, :identifier_mangling=>false)
