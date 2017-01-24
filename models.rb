@@ -19,7 +19,6 @@ module KaeruEra
   Model.db = DB
   Model.plugin :auto_validations
   Model.plugin :prepared_statements
-  Model.plugin :prepared_statements_associations
   Model.plugin :forme
 end
 
