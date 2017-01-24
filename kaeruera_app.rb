@@ -17,6 +17,9 @@ end
 module KaeruEra
   class App < Roda
     opts[:root] = File.dirname(__FILE__)
+    opts[:unsupported_block_result] = :raise
+    opts[:unsupported_matcher] = :raise
+    opts[:verbatim_string_matcher] = true
 
     # The reporter used for reporting internal errors.  Defaults to the same database
     # used to store the errors for the applications that this server tracks.  This
@@ -208,7 +211,7 @@ module KaeruEra
           :applications
         end
 
-        r.on 'applications/:d' do |id|
+        r.on 'applications', :d do |id|
           @app = Application.first!(:user_id=>session[:user_id], :id=>id.to_i)
 
           r.is 'reporter_info' do
@@ -221,7 +224,7 @@ module KaeruEra
           end
         end
 
-        r.is 'error/:d' do |id|
+        r.is 'error', :d do |id|
           @error = get_error(id)
           :error
         end
@@ -238,7 +241,7 @@ module KaeruEra
       end
 
       r.post do
-        r.is 'update_error/:d' do |id|
+        r.is 'update_error', :d do |id|
           @error = get_error(id)
           r.halt(403, view(:content=>"Error Not Open")) if @error.closed
           @error.closed = true if params[:close] == '1'
