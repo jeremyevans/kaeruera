@@ -3,19 +3,19 @@ module KaeruEraLibs
 
   it "should insert current error into database" do
     raise 'foo' rescue (e = $!; (@reporter.report))
-    DB[:errors].first.values_at(:application_id, :error_class, :message, :backtrace).must_equal [@application_id, e.class.name, e.message, e.backtrace]
+    KaeruEra::DB[:errors].first.values_at(:application_id, :error_class, :message, :backtrace).must_equal [@application_id, e.class.name, e.message, e.backtrace]
   end
 
   it "should insert given error into database" do
     raise 'foo' rescue (e = $!)
     raise 'foo' rescue (@reporter.report(:error=>e))
-    DB[:errors].first.values_at(:application_id, :error_class, :message, :backtrace).must_equal [@application_id, e.class.name, e.message, e.backtrace]
+    KaeruEra::DB[:errors].first.values_at(:application_id, :error_class, :message, :backtrace).must_equal [@application_id, e.class.name, e.message, e.backtrace]
   end
 
   it "should insert given params, session, and environment with error" do
     h = {:params=>{'a'=>'b', 'c'=>[1]}, :session=>{'a'=>'b', 'c'=>[1]}, :env=>{'a'=>'b'}}
     raise 'foo' rescue (e = $!; (@reporter.report(h)))
-    DB[:errors].first.values_at(:params, :session, :env).must_equal h.values_at(:params, :session, :env)
+    KaeruEra::DB[:errors].first.values_at(:params, :session, :env).must_equal h.values_at(:params, :session, :env)
   end
 
   it "should return id of inserted row" do

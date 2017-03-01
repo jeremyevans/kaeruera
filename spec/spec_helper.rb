@@ -5,11 +5,11 @@ require 'minitest/hooks/default'
 class Minitest::HooksSpec
   if defined?(TRANSACTIONAL_TESTS)
     around(:all) do |&block|
-      DB.transaction(:rollback=>:always){super(&block)}
+      KaeruEra::DB.transaction(:rollback=>:always){super(&block)}
     end
 
     around do |&block|
-      DB.transaction(:rollback=>:always, :savepoint=>true){super(&block)}
+      KaeruEra::DB.transaction(:rollback=>:always, :savepoint=>true){super(&block)}
     end
   end
 

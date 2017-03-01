@@ -10,10 +10,9 @@ TRANSACTIONAL_TESTS = true
 RESET_DRIVER = true
 require 'spec/spec_helper'
 require 'models'
-include KaeruEra
 
-[:errors, :applications, :users].each{|t| DB[t].delete}
-raise 'foo' rescue User.create(:email=>'kaeruera', :password=>'secret').
+[:errors, :applications, :users].each{|t| KaeruEra::DB[t].delete}
+raise 'foo' rescue KaeruEra::User.create(:email=>'kaeruera', :password=>'secret').
   add_application(:name=>'KaeruEraApp').
   add_app_error(:error_class=>$!.class,
                 :message=>$!.message,
@@ -21,7 +20,9 @@ raise 'foo' rescue User.create(:email=>'kaeruera', :password=>'secret').
                 :params=>Sequel.pg_jsonb('banana'=>123),
                 :session=>Sequel.pg_jsonb('pear'=>nil),
                 :backtrace=>Sequel.pg_array($!.backtrace))
-error_id = DB[:errors].max(:id).to_s
+error_id = KaeruEra::DB[:errors].max(:id).to_s
+
+Gem.suffix_pattern
 
 require 'kaeruera_app'
 
@@ -302,7 +303,7 @@ end
 
 describe KaeruEra do
   before(:all) do
-    a = Application.first
+    a = KaeruEra::Application.first
     50.times do |i|
       raise "foo#{i}" rescue a.add_app_error(:error_class=>$!.class,
                         :message=>$!.message,
@@ -366,13 +367,13 @@ describe KaeruEra do
     all('#content tbody tr').size.must_equal 25
     fill_in 'Notes', :with=>'foobar'
     click_button 'Update Errors'
-    DB[:errors].where(:notes=>'foobar').count.must_equal 25
+    KaeruEra::DB[:errors].where(:notes=>'foobar').count.must_equal 25
 
     click_link 'KaeruEraApp'
     click_link 'Show All Open Errors'
     fill_in 'Notes', :with=>'foobarbaz'
     click_button 'Update Errors'
-    DB[:errors].where(:notes=>'foobarbaz').count.must_equal 51
+    KaeruEra::DB[:errors].where(:notes=>'foobarbaz').count.must_equal 51
 
     click_link 'KaeruEraApp'
     click_link 'Next Page'
@@ -385,7 +386,7 @@ describe KaeruEra do
     fill_in 'Notes', :with=>'foobar'
     check 'Close Errors?'
     click_button 'Update Errors'
-    DB[:errors].where(:notes=>'foobar', :closed=>true).count.must_equal 51
+    KaeruEra::DB[:errors].where(:notes=>'foobar', :closed=>true).count.must_equal 51
 
     click_link 'KaeruEraApp'
     page.html.must_match /No open errors for KaeruEraApp/
