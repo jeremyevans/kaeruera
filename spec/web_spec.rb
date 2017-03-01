@@ -26,7 +26,15 @@ Gem.suffix_pattern
 
 require 'kaeruera_app'
 
+begin
+  require 'refrigerator'
+rescue LoadError
+else
+  Refrigerator.freeze_core(:except=>[(Object.superclass || Object).name])
+end
+
 Capybara.app = KaeruEra::App
+KaeruEra::App.freeze
 
 class Minitest::Spec
   include Rack::Test::Methods
