@@ -20,6 +20,7 @@ module KaeruEra
   Model.plugin :auto_validations
   Model.plugin :prepared_statements
   Model.plugin :forme
+  Model.plugin :subclasses
 end
 
 require ::File.expand_path('../models/user',  __FILE__)
@@ -34,5 +35,6 @@ if ENV['RACK_ENV'] == 'development'
     u.add_application(:name=>'KaeruEraApp')
   end
 else
+  KaeruEra::Model.freeze_descendents
   KaeruEra::DB.freeze
 end
