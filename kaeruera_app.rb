@@ -48,7 +48,6 @@ module KaeruEra
     plugin :halt
     plugin :json
     plugin :forme
-    plugin :symbol_matchers
     plugin :symbol_views
     plugin :delegate
     request_delegate :params
@@ -67,7 +66,7 @@ module KaeruEra
 
     # Returns the application with the given id for the logged in user.
     def get_error(id)
-      @error = Error.with_user(session[:user_id]).first!(:id=>id.to_i)
+      @error = Error.with_user(session[:user_id]).with_pk!(id)
     end
 
     # Does a simple pagination of the results of the dataset.  This
@@ -201,8 +200,8 @@ module KaeruEra
           :applications
         end
 
-        r.on 'applications', :d do |id|
-          @app = Application.first!(:user_id=>session[:user_id], :id=>id.to_i)
+        r.on 'applications', Integer do |id|
+          @app = Application.first!(:user_id=>session[:user_id], :id=>id)
 
           r.is 'reporter_info' do
             :reporter_info
@@ -214,7 +213,7 @@ module KaeruEra
           end
         end
 
-        r.is 'error', :d do |id|
+        r.is 'error', Integer do |id|
           @error = get_error(id)
           :error
         end
@@ -231,7 +230,7 @@ module KaeruEra
       end
 
       r.post do
-        r.is 'update_error', :d do |id|
+        r.is 'update_error', Integer do |id|
           @error = get_error(id)
           r.halt(403, view(:content=>"Error Not Open")) if @error.closed
           @error.closed = true if params[:close] == '1'
