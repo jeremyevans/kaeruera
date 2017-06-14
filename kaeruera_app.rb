@@ -4,16 +4,6 @@ require 'rack/indifferent'
 require ::File.expand_path('../models',  __FILE__)
 require ::File.expand_path('../lib/kaeruera/database_reporter',  __FILE__)
 
-begin
-  require 'tilt/erubi'
-rescue LoadError
-  begin
-    require 'tilt/erubis'
-  rescue LoadError
-    require 'tilt/erb'
-  end
-end
-
 module KaeruEra
   class App < Roda
     opts[:root] = File.dirname(__FILE__)
