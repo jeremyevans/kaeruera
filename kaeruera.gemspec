@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'kaeruera'
-  s.version = '0.2.0'
+  s.version = '0.3.0'
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = false
   s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "MIT-LICENSE"]

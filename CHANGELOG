@@ -1,3 +1,7 @@
+=== 0.3.0 (2017-07-26)
+
+* Use uri and net/http from stdlib instead of rest-client for the reporter (jeremyevans)
+
 === 0.2.0 (2016-05-24)
 
 * Use jsonb instead of hstore/json for env/params/session (jeremyevans)

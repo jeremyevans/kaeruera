@@ -1,4 +1,5 @@
-require 'rest-client'
+require 'uri'
+require 'net/http'
 require 'json'
 
 module KaeruEra
@@ -50,8 +51,17 @@ module KaeruEra
         h[:env] = v
       end
 
-      res = RestClient.post @url, {:data=>h, :id=>@application_id, :token=>@token}.to_json, :content_type => :json, :accept => :json
-      JSON.parse(res)['error_id']
+      url = URI.parse(@url)
+      req = Net::HTTP::Post.new(url.path)
+      req.body = {:data=>h, :id=>@application_id, :token=>@token}.to_json
+      req['Content-Type'] = 'application/json'
+      req['Accept'] = 'application/json'
+      req.basic_auth(url.user, url.password) if url.user
+      res = Net::HTTP.new(url.host, url.port).start do |http|
+        http.use_ssl = true if url.scheme == 'https'
+        http.request(req)
+      end
+      JSON.parse(res.body)['error_id']
     rescue => e
       e
     end

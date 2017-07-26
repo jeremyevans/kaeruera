@@ -200,7 +200,8 @@ similar to this to report errors to KaeruEra:
 
 === KaeruEra::Reporter / KaeruEra::AsyncReporter
 
-* rest-client
+* uri
+* net/http
 * json
 
 == Heroku Setup
