@@ -57,8 +57,9 @@ module KaeruEra
       req['Content-Type'] = 'application/json'
       req['Accept'] = 'application/json'
       req.basic_auth(url.user, url.password) if url.user
-      res = Net::HTTP.new(url.host, url.port).start do |http|
-        http.use_ssl = true if url.scheme == 'https'
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true if url.scheme == 'https'
+      res = http.start do
         http.request(req)
       end
       JSON.parse(res.body)['error_id']
