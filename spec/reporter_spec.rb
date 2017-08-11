@@ -33,8 +33,13 @@ describe KaeruEra::AsyncReporter do
     @reporter = KaeruEra::AsyncReporter.new('http://127.0.0.1:25778/report_error', application_id, '1')
     def @reporter.report(opts={})
       if (r = super) == true
-        sleep 0.3
-        DB[:errors].max(:id)
+        t = Time.now
+        while sleep 0.01
+          if id = DB[:errors].max(:id)
+            return id
+          end
+          raise "time expired" if Time.now - t > 2
+        end
       else
         r
       end
