@@ -1,12 +1,10 @@
-require 'rubygems'
 ENV['RACK_ENV'] = 'test'
-$: << File.dirname(File.dirname(__FILE__))
-require 'db'
-require 'lib/kaeruera/database_reporter'
+require_relative '../db'
+require_relative '../lib/kaeruera/database_reporter'
 
 TRANSACTIONAL_TESTS = true
-require 'spec/spec_helper'
-require 'spec/shared_lib_spec'
+require_relative 'spec_helper'
+require_relative 'shared_lib_spec'
 
 include KaeruEra
 

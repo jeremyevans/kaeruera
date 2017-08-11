@@ -1,15 +1,13 @@
-require 'rubygems'
 ENV['RACK_ENV'] = 'test'
 require 'capybara'
 require 'capybara/dsl'
 require 'capybara/rspec/matchers'
 require 'rack/test'
 
-$: << File.dirname(File.dirname(__FILE__))
 TRANSACTIONAL_TESTS = true
 RESET_DRIVER = true
-require 'spec/spec_helper'
-require 'models'
+require_relative 'spec_helper'
+require_relative '../models'
 
 [:errors, :applications, :users].each{|t| KaeruEra::DB[t].delete}
 raise 'foo' rescue KaeruEra::User.create(:email=>'kaeruera', :password=>'secret').
@@ -24,7 +22,7 @@ error_id = KaeruEra::DB[:errors].max(:id).to_s
 
 Gem.suffix_pattern
 
-require 'kaeruera_app'
+require_relative '../kaeruera_app'
 
 begin
   require 'refrigerator'

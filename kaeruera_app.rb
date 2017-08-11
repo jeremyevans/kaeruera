@@ -1,8 +1,7 @@
-require 'rubygems'
 require 'roda'
 require 'rack/indifferent'
-require ::File.expand_path('../models',  __FILE__)
-require ::File.expand_path('../lib/kaeruera/database_reporter',  __FILE__)
+require_relative 'models'
+require_relative 'lib/kaeruera/database_reporter'
 
 module KaeruEra
   class App < Roda

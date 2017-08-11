@@ -1,15 +1,12 @@
-require 'rubygems'
 ENV['RACK_ENV'] = 'test'
-$: << File.dirname(File.dirname(__FILE__))
-$: << File.join(File.dirname(File.dirname(__FILE__)), 'lib')
-require 'db'
-require 'kaeruera/reporter'
-require 'kaeruera/async_reporter'
+require_relative '../db'
+require_relative '../lib/kaeruera/reporter'
+require_relative '../lib/kaeruera/async_reporter'
 
 include KaeruEra
 
-require 'spec/spec_helper'
-require 'spec/shared_lib_spec'
+require_relative 'spec_helper'
+require_relative 'shared_lib_spec'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')
@@ -38,7 +35,9 @@ describe KaeruEra::AsyncReporter do
           if id = DB[:errors].max(:id)
             return id
           end
-          raise "time expired" if Time.now - t > 2
+          if Time.now - t > 2
+            return nil
+          end
         end
       else
         r

@@ -1,11 +1,9 @@
-require 'rubygems'
 ENV['RACK_ENV'] = 'test'
-$: << File.dirname(File.dirname(__FILE__))
-require 'models'
+require_relative '../models'
 include KaeruEra
 
 TRANSACTIONAL_TESTS = true
-require 'spec/spec_helper'
+require_relative 'spec_helper'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 raise 'foo' rescue User.create(:email=>'ke', :password=>'secret').

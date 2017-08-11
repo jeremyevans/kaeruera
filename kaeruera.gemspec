@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.author = "Jeremy Evans"
   s.email = "code@jeremyevans.net"
   s.homepage = "http://github.com/jeremyevans/kaeruera"
-  s.required_ruby_version = ">= 1.8.7"
+  s.required_ruby_version = ">= 1.9.2"
   s.files = %w(MIT-LICENSE CHANGELOG README.rdoc) + Dir["lib/kaeruera/*.rb"]
   s.description = <<END
 KaeruEra is a simple error tracking application. This

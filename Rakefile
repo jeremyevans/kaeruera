@@ -6,12 +6,12 @@ task :default=>[:database_reporter_spec, :reporter_spec, :model_spec, :web_spec]
 
 desc "Run model specs"
 task :model_spec do
-  sh "#{FileUtils::RUBY} -rubygems spec/model_spec.rb"
+  sh "#{FileUtils::RUBY} spec/model_spec.rb"
 end
 
 desc "Run database_reporter specs"
 task :database_reporter_spec do
-  sh "#{FileUtils::RUBY} -rubygems spec/database_reporter_spec.rb"
+  sh "#{FileUtils::RUBY} spec/database_reporter_spec.rb"
 end
 
 desc "Run reporter specs"
@@ -20,7 +20,7 @@ task "reporter_spec" do |t|
   begin
     unicorn_bin = File.basename(FileUtils::RUBY).sub(/\Aruby/, 'unicorn')
     sh %{#{FileUtils::RUBY} -S #{unicorn_bin} -c spec/unicorn.test.conf -D config.ru}
-    sh "#{FileUtils::RUBY} -rubygems spec/reporter_spec.rb"
+    sh "#{FileUtils::RUBY} spec/reporter_spec.rb"
   ensure
     sh %{kill `cat spec/unicorn.test.pid`}
   end
@@ -28,14 +28,14 @@ end
 
 desc "Run web specs"
 task :web_spec do
-  sh "#{FileUtils::RUBY} -rubygems spec/web_spec.rb"
+  sh "#{FileUtils::RUBY} spec/web_spec.rb"
 end
 
 # Migrations
 
 migrate = lambda do |env, version|
   ENV['RACK_ENV'] = env
-  require './db'
+  require_relative 'db'
   require 'logger'
   Sequel.extension :migration
   DB.loggers << Logger.new($stdout)
@@ -84,7 +84,7 @@ end
 namespace :assets do
   desc "Precompile the assets"
   task :precompile do
-    require './kaeruera_app'
+    require_relative 'kaeruera_app'
     KaeruEra::App.compile_assets
   end
 end

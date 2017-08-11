@@ -1,4 +1,4 @@
-require 'kaeruera/reporter'
+require_relative 'reporter'
 require 'thread'
 
 module KaeruEra

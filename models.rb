@@ -9,7 +9,7 @@ module KaeruEra
     BCRYPT_COST = BCrypt::Engine::DEFAULT_COST
   end
 
-  require ::File.expand_path('../db',  __FILE__)
+  require_relative 'db'
 
   DB.extension :pg_array, :pg_json
 
@@ -23,9 +23,9 @@ module KaeruEra
   Model.plugin :subclasses
 end
 
-require ::File.expand_path('../models/user',  __FILE__)
-require ::File.expand_path('../models/application',  __FILE__)
-require ::File.expand_path('../models/error',  __FILE__)
+require_relative 'models/user'
+require_relative 'models/application'
+require_relative 'models/error'
 
 if ENV['RACK_ENV'] == 'development'
   KaeruEra::DB.loggers << Logger.new($stdout)
