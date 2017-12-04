@@ -1,9 +1,12 @@
 require 'sequel'
-module KaeruEra; end
 
-begin
-  load File.join(File.dirname(__FILE__), 'db_config.rb')
-rescue LoadError
-  KaeruEra::DB = Sequel.connect(ENV['KAERUERA_DATABASE_URL'] || ENV['DATABASE_URL'] || "postgres:///#{'kaeruera_test' if ENV['RACK_ENV'] == 'test'}?user=kaeruera", :identifier_mangling=>false)
+module KaeruEra
+  begin
+    require_relative '.env'
+  rescue LoadError
+  end
+
+  Sequel.extension :pg_array, :pg_json, :pg_array_ops, :pg_json_ops
+  DB = Sequel.connect(ENV.delete('KAERUERA_DATABASE_URL') || ENV.delete('DATABASE_URL') || "postgres:///#{'kaeruera_test' if ENV['RACK_ENV'] == 'test'}?user=kaeruera")
+  DB.extension :pg_array, :pg_json
 end
-KaeruEra::DB.extension(:freeze_datasets)

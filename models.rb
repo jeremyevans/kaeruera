@@ -3,17 +3,13 @@ require 'securerandom'
 require 'logger'
 
 module KaeruEra
+  require_relative 'db'
+
   if ENV['RACK_ENV'] == 'test'
     BCRYPT_COST = BCrypt::Engine::MIN_COST
   else
     BCRYPT_COST = BCrypt::Engine::DEFAULT_COST
   end
-
-  require_relative 'db'
-
-  DB.extension :pg_array, :pg_json
-
-  Sequel.extension :pg_array_ops, :pg_json_ops
 
   Model = Class.new(Sequel::Model)
   Model.db = DB

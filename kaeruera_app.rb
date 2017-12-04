@@ -27,7 +27,7 @@ module KaeruEra
     end
 
     use Rack::CommonLogger if ENV['RACK_ENV'] == 'test'
-    use Rack::Session::Cookie, :secret=>File.file?('kaeruera.secret') ? File.read('kaeruera.secret') : (ENV['KAERUERA_SECRET'] || SecureRandom.hex(20))
+    use Rack::Session::Cookie, :secret=>(ENV.delete('KAERUERA_SECRET') || SecureRandom.hex(30))
     plugin :csrf, :skip => ['POST:/report_error']
 
     plugin :not_found

@@ -1,5 +1,3 @@
-/db_config.rb
+/.env.rb
 /kaeruera-*.gem
-/kaeruera.secret
 /spec/unicorn.test.log
-/spec/unicorn.test.pid
