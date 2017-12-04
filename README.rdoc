@@ -217,11 +217,11 @@ similar to this to report errors to KaeruEra:
 
 == Manual Setup
 
-=== Database Setup
+=== Environment Setup
 
-First, copy the example database configuration file:
-
-  cp db_config.rb.example db_config.rb
+First, create an .env.rb setting the KAERUERA_SECRET (rack
+session secret) and KAERUERA_DATABASE_URL (database connection URL)
+environment variables.
 
 The rest of the instructions assume you are not modifying the
 default database configuration, and that the database super user
@@ -239,6 +239,18 @@ Then, create databases for the application with that user:
   createdb -U postgres -O kaeruera kaeruera_development
   createdb -U postgres -O kaeruera kaeruera_test
   createdb -U postgres -O kaeruera kaeruera_production
+
+You could use the following .env.rb file:
+
+  ENV['KAERUERA_SECRET'] ||= '...'
+  ENV['KAERUERA_DATABASE_URL'] ||= case ENV['RACK_ENV']
+  when 'test'
+    "postgres:///kaeruera_test?user=kaeruera&password=..."
+  when 'production'
+    "postgres:///kaeruera_production?user=kaeruera&password=..."
+  else
+    "postgres:///kaeruera_development?user=kaeruera&password=..."
+  end
 
 Then, you can migrate the database:
 
@@ -262,12 +274,6 @@ In all other cases, you have to setup your user accounts manually:
 It's recommended that you have a kaeruera user and KaeruEraApp application
 for that user, as that is where the web application will log any internal
 errors.
-
-=== Session Secret Setup
-
-Create the session secret file:
-
-  ruby -rsecurerandom -e 'puts SecureRandom.hex(30)' > kaeruera.secret
 
 == Testing
 
