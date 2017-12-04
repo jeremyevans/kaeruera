@@ -6,9 +6,6 @@ require_relative 'lib/kaeruera/database_reporter'
 module KaeruEra
   class App < Roda
     opts[:root] = File.dirname(__FILE__)
-    opts[:unsupported_block_result] = :raise
-    opts[:unsupported_matcher] = :raise
-    opts[:verbatim_string_matcher] = true
 
     # The reporter used for reporting internal errors.  Defaults to the same database
     # used to store the errors for the applications that this server tracks.  This
