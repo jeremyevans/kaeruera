@@ -1,9 +1,0 @@
-url = case ENV['RACK_ENV']
-when 'test'
-  "postgres:///kaeruera_test?user=kaeruera"
-when 'production'
-  "postgres:///kaeruera_production?user=kaeruera"
-else
-  "postgres:///kaeruera_development?user=kaeruera"
-end
-KaeruEra::DB = Sequel.connect(ENV['KAERUERA_DATABASE_URL'] || ENV['DATABASE_URL'] || url, :identifier_mangling=>false)
