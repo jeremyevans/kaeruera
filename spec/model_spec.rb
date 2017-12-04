@@ -59,7 +59,7 @@ describe Error do
 
   it ".search should search by application" do
     Error.search({:application=>Application.first.id.to_s}, user_id).all.must_equal Error.all
-    Error.search({:application=>'0'}, user_id).all.must_equal []
+    Error.search({:application=>0}, user_id).all.must_equal []
   end
 
   it ".search should search by error class" do
@@ -73,8 +73,8 @@ describe Error do
   end
 
   it ".search should search by status" do
-    Error.search({:closed=>'0'}, user_id).all.must_equal Error.all
-    Error.search({:closed=>'1'}, user_id).all.must_equal []
+    Error.search({:closed=>false}, user_id).all.must_equal Error.all
+    Error.search({:closed=>true}, user_id).all.must_equal []
   end
 
   it ".search should search by backtrace" do
@@ -130,8 +130,8 @@ describe Error do
   end
 
   it ".search should search by time occurred" do
-    today = Date.today.to_s
-    tomorrow = (Date.today+1).to_s
+    today = Date.today.to_time
+    tomorrow = (Date.today+1).to_time
     Error.search({:occurred_after=>today}, user_id).all.must_equal Error.all
     Error.search({:occurred_after=>tomorrow}, user_id).all.must_equal []
     Error.search({:occurred_before=>tomorrow}, user_id).all.must_equal Error.all

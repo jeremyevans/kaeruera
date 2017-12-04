@@ -1,5 +1,4 @@
 require 'roda'
-require 'rack/indifferent'
 require_relative 'models'
 require_relative 'lib/kaeruera/database_reporter'
 
@@ -45,8 +44,7 @@ module KaeruEra
     plugin :json
     plugin :forme
     plugin :symbol_views
-    plugin :delegate
-    request_delegate :params
+    plugin :typecast_params
 
     Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
     Forme.default_config = :mine
@@ -71,8 +69,8 @@ module KaeruEra
     # faster than a normal paginator, which requires a count of matching
     # rows, but doesn't allow for jumping more than one page forward at a time.
     def paginator(dataset, per_page=PER_PAGE)
-      return dataset.all if params[:all] == '1'
-      page = (params[:page] || 1).to_i
+      return dataset.all if typecast_params.bool('all')
+      page = typecast_params.pos_int('page', 1)
       page = 1 if page < 1
       @previous_page = true if page > 1
       @page = page
@@ -122,11 +120,17 @@ module KaeruEra
     # If an internal error occurs, record it so that the application
     # can track its own errors.
     error do |e|
-      if REPORTER
-        REPORTER.report(:params=>request.params, :env=>env, :session=>session, :error=>e)
+      case e
+      when Roda::RodaPlugins::TypecastParams::Error
+        response.status = 400
+        view(:content=>"<h1>Invalid parameter submitted: #{h e.param_name}</h1>")
+      else
+        if REPORTER
+          REPORTER.report(:params=>request.params, :env=>env, :session=>session, :error=>e)
+        end
+        #$stderr.puts "#{e.class}: #{e.message}", e.backtrace
+        view(:content=>"<h1>Internal Server Error</h1>")
       end
-      #$stderr.puts e.class, e.message, e.backtrace
-      view(:content=>"Sorry, an error occurred")
     end
 
     plugin :rodauth do
@@ -184,7 +188,7 @@ module KaeruEra
         end
 
         r.post do
-          Application.create(:user_id=>session[:user_id], :name=>params[:name])
+          Application.create(:user_id=>session[:user_id], :name=>typecast_params.str!('name'))
           flash[:notice] = "Application Added"
           r.redirect('/', 303)
         end
@@ -215,8 +219,14 @@ module KaeruEra
         end
 
         r.is 'search' do
-          if search = r['search']
-            @errors = paginator(Error.search(params, session[:user_id]).most_recent)
+          if search = typecast_params.nonempty_str('search')
+            search_opts = typecast_params.convert!(:symbolize=>true) do |tp|
+              tp.pos_int(%w'application')
+              tp.nonempty_str(%w'error_class message backtrace field key field_type value')
+              tp.bool('closed')
+              tp.time(%w'occurred_after occurred_before')
+            end
+            @errors = paginator(Error.search(search_opts, session[:user_id]).most_recent)
             :errors
           else
             @apps = user_apps.order(:name).all
@@ -229,18 +239,18 @@ module KaeruEra
         r.is 'update_error', Integer do |id|
           @error = get_error(id)
           r.halt(403, view(:content=>"Error Not Open")) if @error.closed
-          @error.closed = true if params[:close] == '1'
-          @error.update(:notes=>params[:notes].to_s)
+          @error.closed = true if typecast_params.bool('close')
+          @error.update(:notes=>typecast_params.str!('notes'))
           flash[:notice] = "Error Updated"
           r.redirect("/error/#{@error.id}")
         end
 
         r.is 'update_multiple_errors' do
-          h = {:notes=>params[:notes].to_s}
-          h[:closed] = true if params[:close] == '1'
+          h = {:notes=>typecast_params.str!('notes')}
+          h[:closed] = true if typecast_params.bool('close')
           n = Error.
             with_user(session[:user_id]).
-            where(:id=>params[:ids].to_a.map(&:to_i), :closed=>false).
+            where(:id=>typecast_params.array!(:pos_int, 'ids'), :closed=>false).
             update(h)
           flash[:notice] = "Updated #{n} errors"
           r.redirect("/")

@@ -7,27 +7,26 @@ class Error < Model
   dataset_module do
     # Backbone of the web application search form.  Restricts the search
     # to the given user, and further restricts it based on the the hash
-    # of params.
-    def search(params, user_id)
-      ds = where(:user_id=>user_id.to_i)
-      ds = where(:application_id=>params[:application].to_i) if params[:application] && !params[:application].empty?
-      ds = ds.where(:error_class=>params[:class].to_s) if params[:class] && !params[:class].empty?
-      ds = ds.where(:message=>params[:message].to_s) if params[:message] && !params[:message].empty?
-      ds = ds.where(:closed=>params[:closed] == '1') if params[:closed] && !params[:closed].empty?
-      ds = ds.where(Sequel.pg_array(:backtrace).contains([params[:backtrace].to_s])) if params[:backtrace] && !params[:backtrace].empty?
-      if %w'env params session'.include?(type = params[:field]) && !(key = params[:key].to_s).empty?
-        param_value = params[:value].to_s
+    # of search_opts.
+    def search(search_opts, user_id)
+      ds = where(:user_id=>user_id)
+      ds = where(:application_id=>search_opts[:application]) if search_opts[:application]
+      ds = ds.where(:error_class=>search_opts[:class]) if search_opts[:class]
+      ds = ds.where(:message=>search_opts[:message]) if search_opts[:message]
+      ds = ds.where(:closed=>search_opts[:closed]) unless search_opts[:closed].nil?
+      ds = ds.where(Sequel.pg_array(:backtrace).contains([search_opts[:backtrace]])) if search_opts[:backtrace]
+      if %w'env params session'.include?(type = search_opts[:field]) && (key = search_opts[:key])
         jsonb = Sequel.pg_jsonb(type.to_sym)
 
-        ds = if param_value.empty?
-          ds.where(jsonb.has_key?(key))
-        else
-          param_value = convert_json_param_value(param_value, params[:field_type])
+        ds = if param_value = search_opts[:value]
+          param_value = convert_json_param_value(param_value, search_opts[:field_type])
           ds.where(jsonb.contains(key=>param_value))
+        else
+          ds.where(jsonb.has_key?(key))
         end
       end
-      ds = ds.where{created_at >= params[:occurred_after].to_s} if params[:occurred_after] && !params[:occurred_after].empty?
-      ds = ds.where{created_at < params[:occurred_before].to_s} if params[:occurred_before] && !params[:occurred_before].empty?
+      ds = ds.where{created_at >= search_opts[:occurred_after]} if search_opts[:occurred_after]
+      ds = ds.where{created_at < search_opts[:occurred_before]} if search_opts[:occurred_before]
       ds
     end
 
