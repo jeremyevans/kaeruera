@@ -45,6 +45,7 @@ module KaeruEra
     plugin :forme
     plugin :symbol_views
     plugin :typecast_params
+    alias tp typecast_params
 
     Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
     Forme.default_config = :mine
@@ -69,8 +70,8 @@ module KaeruEra
     # faster than a normal paginator, which requires a count of matching
     # rows, but doesn't allow for jumping more than one page forward at a time.
     def paginator(dataset, per_page=PER_PAGE)
-      return dataset.all if typecast_params.bool('all')
-      page = typecast_params.pos_int('page', 1)
+      return dataset.all if tp.bool('all')
+      page = tp.pos_int('page', 1)
       page = 1 if page < 1
       @previous_page = true if page > 1
       @page = page
@@ -188,7 +189,7 @@ module KaeruEra
         end
 
         r.post do
-          Application.create(:user_id=>session[:user_id], :name=>typecast_params.str!('name'))
+          Application.create(:user_id=>session[:user_id], :name=>tp.str!('name'))
           flash[:notice] = "Application Added"
           r.redirect('/', 303)
         end
@@ -219,8 +220,8 @@ module KaeruEra
         end
 
         r.is 'search' do
-          if search = typecast_params.nonempty_str('search')
-            search_opts = typecast_params.convert!(:symbolize=>true) do |tp|
+          if search = tp.nonempty_str('search')
+            search_opts = tp.convert!(:symbolize=>true) do |tp|
               tp.pos_int(%w'application')
               tp.nonempty_str(%w'error_class message backtrace field key field_type value')
               tp.bool('closed')
@@ -239,18 +240,18 @@ module KaeruEra
         r.is 'update_error', Integer do |id|
           @error = get_error(id)
           r.halt(403, view(:content=>"Error Not Open")) if @error.closed
-          @error.closed = true if typecast_params.bool('close')
-          @error.update(:notes=>typecast_params.str!('notes'))
+          @error.closed = true if tp.bool('close')
+          @error.update(:notes=>tp.str!('notes'))
           flash[:notice] = "Error Updated"
           r.redirect("/error/#{@error.id}")
         end
 
         r.is 'update_multiple_errors' do
-          h = {:notes=>typecast_params.str!('notes')}
-          h[:closed] = true if typecast_params.bool('close')
+          h = {:notes=>tp.str!('notes')}
+          h[:closed] = true if tp.bool('close')
           n = Error.
             with_user(session[:user_id]).
-            where(:id=>typecast_params.array!(:pos_int, 'ids'), :closed=>false).
+            where(:id=>tp.array!(:pos_int, 'ids'), :closed=>false).
             update(h)
           flash[:notice] = "Updated #{n} errors"
           r.redirect("/")
