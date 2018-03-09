@@ -44,6 +44,7 @@ module KaeruEra
     plugin :json
     plugin :forme
     plugin :symbol_views
+    plugin :request_aref, :raise
     plugin :typecast_params
     alias tp typecast_params
 
