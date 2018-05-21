@@ -17,6 +17,7 @@ module KaeruEra
   Model.plugin :prepared_statements
   Model.plugin :forme
   Model.plugin :subclasses
+  Model.plugin :pg_auto_constraint_validations
 end
 
 require_relative 'models/user'
