@@ -2,7 +2,6 @@ Gem::Specification.new do |s|
   s.name = 'kaeruera'
   s.version = '0.3.0'
   s.platform = Gem::Platform::RUBY
-  s.has_rdoc = false
   s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "MIT-LICENSE"]
   s.rdoc_options += ["--quiet", "--line-numbers", "--inline-source", '--title', 'Reporter Libraries for KaeruEra', '--main', 'README.rdoc']
   s.summary = "Reporter Libraries for KaeruEra"
