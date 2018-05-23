@@ -24,7 +24,7 @@ module KaeruEra
 
     use Rack::CommonLogger if ENV['RACK_ENV'] == 'test'
     use Rack::Session::Cookie, :secret=>(ENV.delete('KAERUERA_SECRET') || SecureRandom.hex(30))
-    plugin :csrf, :skip => ['POST:/report_error']
+    plugin :route_csrf
 
     plugin :not_found
     plugin :error_handler
@@ -42,7 +42,7 @@ module KaeruEra
     plugin :h
     plugin :halt
     plugin :json
-    plugin :forme
+    plugin :forme_route_csrf
     plugin :symbol_views
     plugin :request_aref, :raise
     plugin :typecast_params
@@ -135,7 +135,7 @@ module KaeruEra
       end
     end
 
-    plugin :rodauth do
+    plugin :rodauth, :csrf=>:route_csrf do
       db DB
       enable :login, :logout, :change_password
       session_key :user_id
@@ -152,7 +152,6 @@ module KaeruEra
 
     route do |r|
       r.assets
-      r.rodauth
 
       r.post 'report_error' do
         params = JSON.parse(request.body.read)
@@ -179,6 +178,9 @@ module KaeruEra
 
         {'error_id' => DB[:errors].insert(h)}
       end
+
+      check_csrf!
+      r.rodauth
 
       # Force users to login before using the site, except for error
       # reporting (which uses the application's token).
