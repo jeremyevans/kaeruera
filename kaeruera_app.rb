@@ -30,7 +30,7 @@ module KaeruEra
     plugin :error_handler
     plugin :render, :escape=>:erubi
     plugin :assets,
-      :css=>%w'bootstrap.min.css application.scss',
+      :css=>%w'bootstrap-3.3.7.customized.min.css application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},
       :css_dir=>nil,
       :compiled_path=>nil,
@@ -148,6 +148,15 @@ module KaeruEra
       if DEMO_MODE
         before_change_password{r.halt(404)}
       end
+    end
+
+    plugin :content_security_policy do |csp|
+      csp.default_src :none
+      csp.style_src :self, :unsafe_inline
+      csp.img_src :self
+      csp.form_action :self
+      csp.base_uri :none
+      csp.frame_ancestors :none
     end
 
     route do |r|
