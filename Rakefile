@@ -38,8 +38,8 @@ migrate = lambda do |env, version|
   require_relative 'db'
   require 'logger'
   Sequel.extension :migration
-  DB.loggers << Logger.new($stdout)
-  Sequel::Migrator.apply(DB, 'migrate', version)
+  KaeruEra::DB.loggers << Logger.new($stdout)
+  Sequel::Migrator.apply(KaeruEra::DB, 'migrate', version)
 end
 
 desc "Migrate test database to latest version"
@@ -55,7 +55,7 @@ end
 desc "Migrate test database all the way down and then back up"
 task :test_bounce do
   migrate.call('test', 0)
-  Sequel::Migrator.apply(DB, 'migrate')
+  Sequel::Migrator.apply(KaeruEra::DB, 'migrate')
 end
 
 desc "Migrate development database to latest version"
@@ -71,7 +71,7 @@ end
 desc "Migrate development database all the way down and then back up"
 task :dev_bounce do
   migrate.call('development', 0)
-  Sequel::Migrator.apply(DB, 'migrate')
+  Sequel::Migrator.apply(KaeruEra::DB, 'migrate')
 end
 
 desc "Migrate production database to latest version"

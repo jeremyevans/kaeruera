@@ -190,7 +190,6 @@ similar to this to report errors to KaeruEra:
 * bcrypt
 * forme
 * json
-* rack_csrf
 * rack-compatible web server
 
 === KaeruEra::DatabaseReporter
@@ -213,7 +212,7 @@ similar to this to report errors to KaeruEra:
   heroku run rake production_up
   heroku config:set KAERUERA_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.hex(30)'`
   heroku run irb -r ./models
-  irb> User.create(:email=>'foo', :password=>'bar')
+  irb> KaeruEra::User.create(:email=>'foo', :password=>'bar')
 
 == Manual Setup
 
@@ -269,7 +268,7 @@ in for the first time in development mode.
 In all other cases, you have to setup your user accounts manually:
 
   $ irb -r ./models
-  User.create(:email=>'foo', :password=>'bar')
+  KaeruEra::User.create(:email=>'foo', :password=>'bar')
 
 It's recommended that you have a kaeruera user and KaeruEraApp application
 for that user, as that is where the web application will log any internal
