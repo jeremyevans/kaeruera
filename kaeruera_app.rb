@@ -57,12 +57,12 @@ module KaeruEra
 
     # Returns a dataset of all applications for the logged in user.
     def user_apps
-      Application.with_user(session[:user_id])
+      Application.with_user(session['user_id'])
     end
 
     # Returns the application with the given id for the logged in user.
     def get_error(id)
-      @error = Error.with_user(session[:user_id]).with_pk!(id)
+      @error = Error.with_user(session['user_id']).with_pk!(id)
     end
 
     # Does a simple pagination of the results of the dataset.  This
@@ -138,7 +138,7 @@ module KaeruEra
     plugin :rodauth, :csrf=>:route_csrf do
       db DB
       enable :login, :logout, :change_password
-      session_key :user_id
+      session_key 'user_id'
       login_param 'email'
       login_label 'Email'
       login_column :email
@@ -193,7 +193,7 @@ module KaeruEra
 
       # Force users to login before using the site, except for error
       # reporting (which uses the application's token).
-      r.redirect('/login') unless session[:user_id]
+      r.redirect('/login') unless session['user_id']
 
       r.is 'add_application' do
         r.get do
@@ -201,7 +201,7 @@ module KaeruEra
         end
 
         r.post do
-          Application.create(:user_id=>session[:user_id], :name=>tp.str!('name'))
+          Application.create(:user_id=>session['user_id'], :name=>tp.str!('name'))
           flash[:notice] = "Application Added"
           r.redirect('/', 303)
         end
@@ -214,7 +214,7 @@ module KaeruEra
         end
 
         r.on 'applications', Integer do |id|
-          @app = Application.first!(:user_id=>session[:user_id], :id=>id)
+          @app = Application.first!(:user_id=>session['user_id'], :id=>id)
 
           r.is 'reporter_info' do
             :reporter_info
@@ -239,7 +239,7 @@ module KaeruEra
               tp.bool('closed')
               tp.time(%w'occurred_after occurred_before')
             end
-            @errors = paginator(Error.search(search_opts, session[:user_id]).most_recent)
+            @errors = paginator(Error.search(search_opts, session['user_id']).most_recent)
             :errors
           else
             @apps = user_apps.order(:name).all
@@ -262,7 +262,7 @@ module KaeruEra
           h = {:notes=>tp.str!('notes')}
           h[:closed] = true if tp.bool('close')
           n = Error.
-            with_user(session[:user_id]).
+            with_user(session['user_id']).
             where(:id=>tp.array!(:pos_int, 'ids'), :closed=>false).
             update(h)
           flash[:notice] = "Updated #{n} errors"
