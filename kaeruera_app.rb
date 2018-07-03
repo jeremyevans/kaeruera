@@ -23,7 +23,6 @@ module KaeruEra
     end
 
     use Rack::CommonLogger if ENV['RACK_ENV'] == 'test'
-    use Rack::Session::Cookie, :secret=>(ENV.delete('KAERUERA_SECRET') || SecureRandom.hex(30))
     plugin :route_csrf
 
     plugin :not_found
@@ -47,6 +46,8 @@ module KaeruEra
     plugin :request_aref, :raise
     plugin :typecast_params
     alias tp typecast_params
+
+    plugin :sessions, :cipher_secret=>ENV.delete('KAERUERA_CIPHER_SECRET'), :hmac_secret=>ENV.delete('KAERUERA_HMAC_SECRET'), :key=>'kaeruera.session'
 
     Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
     Forme.default_config = :mine
@@ -202,7 +203,7 @@ module KaeruEra
 
         r.post do
           Application.create(:user_id=>session['user_id'], :name=>tp.str!('name'))
-          flash[:notice] = "Application Added"
+          flash['notice'] = "Application Added"
           r.redirect('/', 303)
         end
       end
@@ -254,7 +255,7 @@ module KaeruEra
           r.halt(403, view(:content=>"Error Not Open")) if @error.closed
           @error.closed = true if tp.bool('close')
           @error.update(:notes=>tp.str!('notes'))
-          flash[:notice] = "Error Updated"
+          flash['notice'] = "Error Updated"
           r.redirect("/error/#{@error.id}")
         end
 
@@ -265,7 +266,7 @@ module KaeruEra
             with_user(session['user_id']).
             where(:id=>tp.array!(:pos_int, 'ids'), :closed=>false).
             update(h)
-          flash[:notice] = "Updated #{n} errors"
+          flash['notice'] = "Updated #{n} errors"
           r.redirect("/")
         end
       end

@@ -1,7 +1,6 @@
 ENV['RACK_ENV'] = 'test'
 require 'capybara'
 require 'capybara/dsl'
-require 'capybara/rspec/matchers'
 require 'rack/test'
 
 TRANSACTIONAL_TESTS = true
@@ -28,7 +27,7 @@ begin
   require 'refrigerator'
 rescue LoadError
 else
-  Refrigerator.freeze_core(:except=>[(Object.superclass || Object).name])
+  Refrigerator.freeze_core
 end
 
 Capybara.app = KaeruEra::App

@@ -210,7 +210,9 @@ similar to this to report errors to KaeruEra:
   heroku pg:promote HEROKU_POSTGRESQL_COLOR_URL
   git push heroku master
   heroku run rake production_up
-  heroku config:set KAERUERA_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.hex(30)'`
+  heroku config:set \
+    KAERUERA_CIPHER_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.base64(24)'`
+    KAERUERA_HMAC_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.base64(24)'`
   heroku run irb -r ./models
   irb> KaeruEra::User.create(:email=>'foo', :password=>'bar')
 
@@ -218,9 +220,10 @@ similar to this to report errors to KaeruEra:
 
 === Environment Setup
 
-First, create an .env.rb setting the KAERUERA_SECRET (rack
-session secret) and KAERUERA_DATABASE_URL (database connection URL)
-environment variables.
+First, create an .env.rb setting the KAERUERA_CIPHER_SECRET and
+KAERUERA_HMAC_SECRET (session secrets, should be 32 bytes each)
+and KAERUERA_DATABASE_URL (database connection URL) environment
+variables.
 
 The rest of the instructions assume you are not modifying the
 default database configuration, and that the database super user

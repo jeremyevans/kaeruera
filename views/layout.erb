@@ -30,11 +30,11 @@
 </nav>
 
 <div class="container" id="content">
-  <% if flash[:notice] %>
-    <div class="alert alert-success"><p><%= flash[:notice] %></p></div>
+  <% if flash['notice'] %>
+    <div class="alert alert-success"><p><%= flash['notice'] %></p></div>
   <% end %>
-  <% if flash[:error] %>
-    <div class="alert alert-error"><p><%= flash[:error] %></p></div>
+  <% if flash['error'] %>
+    <div class="alert alert-error"><p><%= flash['error'] %></p></div>
   <% end %>
   <%== "<h1>#{h @title}</h1>" if @title %>
   <%== yield %>
