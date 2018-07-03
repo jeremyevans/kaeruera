@@ -179,7 +179,7 @@ module KaeruEra
           h[:params] = Sequel.pg_jsonb(v.to_hash)
         end
         if v = data['session']
-          h['session'] = Sequel.pg_jsonb(v.to_hash)
+          h[:session] = Sequel.pg_jsonb(v.to_hash)
         end
         if v = data['env']
           h[:env] = Sequel.pg_jsonb(v.to_hash)
