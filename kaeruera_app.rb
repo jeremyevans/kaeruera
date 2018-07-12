@@ -47,7 +47,7 @@ module KaeruEra
     plugin :typecast_params
     alias tp typecast_params
 
-    plugin :sessions, :cipher_secret=>ENV.delete('KAERUERA_CIPHER_SECRET'), :hmac_secret=>ENV.delete('KAERUERA_HMAC_SECRET'), :key=>'kaeruera.session'
+    plugin :sessions, :secret=>ENV.delete('KAERUERA_SESSION_SECRET'), :key=>'kaeruera.session'
 
     Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
     Forme.default_config = :mine

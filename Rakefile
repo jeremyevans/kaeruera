@@ -2,8 +2,6 @@ require "rake"
 
 # Specs
 
-default_tests = [:database_reporter_spec, :model_spec]
-
 desc "Run model specs"
 task :model_spec do
   sh "#{FileUtils::RUBY} spec/model_spec.rb"
@@ -14,31 +12,27 @@ task :database_reporter_spec do
   sh "#{FileUtils::RUBY} spec/database_reporter_spec.rb"
 end
 
-if RUBY_VERSION >= '2'
-  default_tests.concat([:reporter_spec, :web_spec])
 
-  desc "Run reporter specs"
-  task "reporter_spec" do |t|
-    sh %{echo > spec/unicorn.test.log}
-    begin
-      ENV['KAERUERA_CIPHER_SECRET'] = '1'*32
-      ENV['KAERUERA_HMAC_SECRET'] = '2'*32
-      unicorn_bin = File.basename(FileUtils::RUBY).sub(/\Aruby/, 'unicorn')
-      sh %{#{FileUtils::RUBY} -S #{unicorn_bin} -c spec/unicorn.test.conf -D config.ru}
-      sh "#{FileUtils::RUBY} spec/reporter_spec.rb"
-    ensure
-      sh %{kill `cat spec/unicorn.test.pid`}
-    end
-  end
-
-  desc "Run web specs"
-  task :web_spec do
-    sh "#{FileUtils::RUBY} spec/web_spec.rb"
+desc "Run reporter specs"
+task "reporter_spec" do |t|
+  sh %{echo > spec/unicorn.test.log}
+  begin
+    ENV['KAERUERA_SESSION_SECRET'] = '1'*64
+    unicorn_bin = File.basename(FileUtils::RUBY).sub(/\Aruby/, 'unicorn')
+    sh %{#{FileUtils::RUBY} -S #{unicorn_bin} -c spec/unicorn.test.conf -D config.ru}
+    sh "#{FileUtils::RUBY} spec/reporter_spec.rb"
+  ensure
+    sh %{kill `cat spec/unicorn.test.pid`}
   end
 end
 
+desc "Run web specs"
+task :web_spec do
+  sh "#{FileUtils::RUBY} spec/web_spec.rb"
+end
+
 desc "Run all specs"
-task :default=>default_tests
+task :default=>[:database_reporter_spec, :model_spec, :reporter_spec, :web_spec]
 
 # Migrations
 

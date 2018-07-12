@@ -27,7 +27,7 @@ begin
   require 'refrigerator'
 rescue LoadError
 else
-  Refrigerator.freeze_core
+  Refrigerator.freeze_core(:except=>['BasicObject'])
 end
 
 Capybara.app = KaeruEra::App

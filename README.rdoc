@@ -211,8 +211,7 @@ similar to this to report errors to KaeruEra:
   git push heroku master
   heroku run rake production_up
   heroku config:set \
-    KAERUERA_CIPHER_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.base64(24)'`
-    KAERUERA_HMAC_SECRET=`ruby -rsecurerandom -e 'puts SecureRandom.base64(24)'`
+    KAERUERA_SESSION_SECRET=`ruby -rsecurerandom -e 'print SecureRandom.random_bytes(64).gsub("\x00"){((rand*255).to_i+1).chr}'`
   heroku run irb -r ./models
   irb> KaeruEra::User.create(:email=>'foo', :password=>'bar')
 
@@ -220,10 +219,9 @@ similar to this to report errors to KaeruEra:
 
 === Environment Setup
 
-First, create an .env.rb setting the KAERUERA_CIPHER_SECRET and
-KAERUERA_HMAC_SECRET (session secrets, should be 32 bytes each)
-and KAERUERA_DATABASE_URL (database connection URL) environment
-variables.
+First, create an .env.rb setting the KAERUERA_SESSION_SECRET
+(>=64 bytes of random data) and KAERUERA_DATABASE_URL
+(database connection URL) environment variables.
 
 The rest of the instructions assume you are not modifying the
 default database configuration, and that the database super user
@@ -244,7 +242,7 @@ Then, create databases for the application with that user:
 
 You could use the following .env.rb file:
 
-  ENV['KAERUERA_SECRET'] ||= '...'
+  ENV['KAERUERA_SESSION_SECRET'] ||= '...'
   ENV['KAERUERA_DATABASE_URL'] ||= case ENV['RACK_ENV']
   when 'test'
     "postgres:///kaeruera_test?user=kaeruera&password=..."
