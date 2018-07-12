@@ -1,11 +1,11 @@
-require 'sequel'
+begin
+  require_relative '.env'
+rescue LoadError
+end
+
+require 'sequel/core'
 
 module KaeruEra
-  begin
-    require_relative '.env'
-  rescue LoadError
-  end
-
   Sequel.extension :pg_array, :pg_json, :pg_array_ops, :pg_json_ops
   DB = Sequel.connect(ENV.delete('KAERUERA_DATABASE_URL') || ENV.delete('DATABASE_URL') || "postgres:///#{'kaeruera_test' if ENV['RACK_ENV'] == 'test'}?user=kaeruera")
   DB.extension :pg_array, :pg_json

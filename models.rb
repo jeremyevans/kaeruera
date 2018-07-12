@@ -2,9 +2,10 @@ require 'bcrypt'
 require 'securerandom'
 require 'logger'
 
-module KaeruEra
-  require_relative 'db'
+require_relative 'db'
+require 'sequel'
 
+module KaeruEra
   if ENV['RACK_ENV'] == 'test'
     BCRYPT_COST = BCrypt::Engine::MIN_COST
   else
