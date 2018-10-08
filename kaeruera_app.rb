@@ -47,6 +47,24 @@ module KaeruEra
     plugin :typecast_params
     alias tp typecast_params
 
+    logger = case ENV['RACK_ENV']
+    when 'development', 'test' # Remove development after Unicorn 5.5+
+      Class.new{def write(_) end}.new
+    else
+      $stderr
+    end
+    plugin :common_logger, logger
+
+    if ENV['RACK_ENV'] == 'development'
+      plugin :exception_page
+      class RodaRequest
+        def assets
+          exception_page_assets
+          super
+        end
+      end
+    end
+
     plugin :sessions, :secret=>ENV.delete('KAERUERA_SESSION_SECRET'), :key=>'kaeruera.session'
 
     Forme.register_config(:mine, :base=>:default, :serializer=>:html_usa, :labeler=>:explicit, :wrapper=>:div)
@@ -131,7 +149,8 @@ module KaeruEra
         if REPORTER
           REPORTER.report(:params=>request.params, :env=>env, :session=>session, :error=>e)
         end
-        #$stderr.puts "#{e.class}: #{e.message}", e.backtrace
+        $stderr.puts "#{e.class}: #{e.message}", e.backtrace unless ENV['RACK_ENV'] == 'test'
+        next exception_page(e, :assets=>true) if ENV['RACK_ENV'] == 'development'
         view(:content=>"<h1>Internal Server Error</h1>")
       end
     end
