@@ -24,7 +24,6 @@ module KaeruEra
       DEMO_MODE = false
     end
 
-    use Rack::CommonLogger if ENV['RACK_ENV'] == 'test'
     plugin :route_csrf
     plugin :direct_call
     plugin :not_found
