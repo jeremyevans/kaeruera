@@ -5,6 +5,8 @@ require_relative 'lib/kaeruera/database_reporter'
 module KaeruEra
   class App < Roda
     opts[:root] = File.dirname(__FILE__)
+    opts[:check_dynamic_arity] = false
+    opts[:check_arity] = :warn
 
     # The reporter used for reporting internal errors.  Defaults to the same database
     # used to store the errors for the applications that this server tracks.  This
@@ -24,7 +26,7 @@ module KaeruEra
 
     use Rack::CommonLogger if ENV['RACK_ENV'] == 'test'
     plugin :route_csrf
-
+    plugin :direct_call
     plugin :not_found
     plugin :error_handler
     plugin :render, :escape=>:erubi
