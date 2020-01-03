@@ -43,7 +43,7 @@ module KaeruEra
     plugin :h
     plugin :halt
     plugin :json
-    plugin :forme_route_csrf
+    plugin :forme_set, secret: ENV['KAERUERA_SESSION_SECRET']
     plugin :symbol_views
     plugin :request_aref, :raise
     plugin :typecast_params
@@ -183,12 +183,14 @@ module KaeruEra
 
     hash_routes :root do
       is 'add_application' do |r|
+        @app = Application.new(:user_id=>session['user_id'])
+
         r.get do
           :add_application
         end
 
         r.post do
-          Application.create(:user_id=>session['user_id'], :name=>tp.str!('name'))
+          forme_set(@app).save
           flash['notice'] = "Application Added"
           r.redirect('/', 303)
         end
@@ -242,7 +244,7 @@ module KaeruEra
           @error = get_error(id)
           r.halt(403, view(:content=>"Error Not Open")) if @error.closed
           @error.closed = true if tp.bool('close')
-          @error.update(:notes=>tp.str!('notes'))
+          forme_set(@error).save_changes
           flash['notice'] = "Error Updated"
           r.redirect("/error/#{@error.id}")
         end

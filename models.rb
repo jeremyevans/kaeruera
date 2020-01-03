@@ -17,6 +17,7 @@ module KaeruEra
   Model.plugin :auto_validations
   Model.plugin :prepared_statements
   Model.plugin :forme
+  Model.plugin :forme_set
   Model.plugin :subclasses
   Model.plugin :pg_auto_constraint_validations
 end

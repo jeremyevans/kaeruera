@@ -1,16 +1,5 @@
 <% @title = 'Add Application' %>
 
-<form action="/add_application" class="form-horizontal" method="post">
-  <%== csrf_tag("/add_application") %>
-  <div class="form-group">
-    <label class="col-sm-2 control-label" for="name">Application Name</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" name="name" id="name"/>
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <input type="submit" class="btn btn-default" value="Add Application"/>
-    </div>
-  </div>
-</form>
+<% form(@app, {:class=>"form-horizontal"}, :button=>{:value=>"Add Application", :class=>"btn btn-primary"}) do |f| %>
+  <%== f.input(:name, :label=>"Application Name", :size=>80) %>
+<% end %>
