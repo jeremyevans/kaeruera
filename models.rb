@@ -20,6 +20,7 @@ module KaeruEra
   Model.plugin :forme_set
   Model.plugin :subclasses
   Model.plugin :pg_auto_constraint_validations
+  Model.plugin :forbid_lazy_load if ENV['RACK_ENV'] == 'test'
 end
 
 require_relative 'models/user'
