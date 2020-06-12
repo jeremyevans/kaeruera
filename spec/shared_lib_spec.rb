@@ -14,7 +14,7 @@ module KaeruEraLibs
 
   it "should insert given params, session, and environment with error" do
     h = {:params=>{'a'=>'b', 'c'=>[1]}, :session=>{'a'=>'b', 'c'=>[1]}, :env=>{'a'=>'b'}}
-    raise 'foo' rescue (e = $!; (@reporter.report(h)))
+    raise 'foo' rescue @reporter.report(h)
     KaeruEra::DB[:errors].first.values_at(:params, :session, :env).must_equal h.values_at(:params, :session, :env)
   end
 
