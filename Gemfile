@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'pg'
-gem 'sequel', '>= 5.8'
+gem 'sequel', '>= 5.35'
 gem 'sequel_pg', '>= 1.7'
 gem 'roda', '>= 3.35'
 gem 'rodauth', '>= 1.18'
