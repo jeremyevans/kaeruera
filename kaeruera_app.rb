@@ -41,6 +41,7 @@ module KaeruEra
       :gzip=>true
     plugin :flash
     plugin :h
+    plugin :r
     plugin :halt
     plugin :json
     plugin :forme_set, secret: ENV['KAERUERA_SESSION_SECRET']
@@ -149,7 +150,7 @@ module KaeruEra
         view(:content=>"<h1>Invalid parameter submitted: #{h e.param_name}</h1>")
       else
         if REPORTER
-          REPORTER.report(:params=>request.params, :env=>env, :session=>session, :error=>e)
+          REPORTER.report(:params=>r.params, :env=>env, :session=>session, :error=>e)
         end
         $stderr.puts "#{e.class}: #{e.message}", e.backtrace unless ENV['RACK_ENV'] == 'test'
         next exception_page(e, :assets=>true) if ENV['RACK_ENV'] == 'development'
@@ -258,13 +259,13 @@ module KaeruEra
           where(:id=>tp.array!(:pos_int, 'ids'), :closed=>false).
           update(h)
         flash['notice'] = "Updated #{n} errors"
-        request.redirect("/")
+        r.redirect("/")
       end
     end
 
     route do |r|
       r.post 'report_error' do
-        params = JSON.parse(request.body.read)
+        params = JSON.parse(r.body.read)
         data = params['data']
         r.halt(404, "No matching application") unless app = Application.first!(:token=>params['token'].to_s, :id=>params['id'].to_i)
 
