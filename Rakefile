@@ -91,3 +91,11 @@ namespace :assets do
     KaeruEra::App.compile_assets
   end
 end
+
+desc "Annotate Sequel models"
+task "annotate" do
+  ENV['RACK_ENV'] = 'development'
+  require_relative 'models'
+  require 'sequel/annotate'
+  Sequel::Annotate.annotate(Dir['models/*.rb'], :namespace=>true)
+end
