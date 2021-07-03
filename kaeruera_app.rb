@@ -18,7 +18,7 @@ module KaeruEra
     PER_PAGE = 25
 
     # Whether demo is on.  In demo mode, passwords cannot be changed.
-    if ENV['DEMO_MODE'] == '1'
+    if ENV['KAERUERA_DEMO_MODE'] == '1'
       DEMO_MODE = true
     else
       DEMO_MODE = false
