@@ -169,6 +169,7 @@ module KaeruEra
       account_password_hash_column :password_hash
       title_instance_variable :@title
       if DEMO_MODE
+        login_input_type 'text'
         before_change_password{r.halt(404)}
       end
     end
