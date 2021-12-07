@@ -31,7 +31,7 @@ module KaeruEra
     plugin :error_handler
     plugin :render, :escape=>:erubi
     plugin :assets,
-      :css=>%w'bootstrap-3.3.7.customized.min.css application.scss',
+      :css=>%w'application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},
       :css_dir=>nil,
       :compiled_path=>nil,
