@@ -2,16 +2,18 @@ require "rake"
 
 # Specs
 
+ruby = FileUtils::RUBY
+ruby += ' -w' if RUBY_VERSION >= '3'
+
 desc "Run model specs"
 task :model_spec do
-  sh "#{FileUtils::RUBY} spec/model_spec.rb"
+  sh "#{ruby} spec/model_spec.rb"
 end
 
 desc "Run database_reporter specs"
 task :database_reporter_spec do
-  sh "#{FileUtils::RUBY} spec/database_reporter_spec.rb"
+  sh "#{ruby} spec/database_reporter_spec.rb"
 end
-
 
 desc "Run reporter specs"
 task "reporter_spec" do |t|
@@ -20,7 +22,7 @@ task "reporter_spec" do |t|
     ENV['KAERUERA_SESSION_SECRET'] = '1'*64
     unicorn_bin = File.basename(FileUtils::RUBY).sub(/\Aruby/, 'unicorn')
     sh %{#{FileUtils::RUBY} -S #{unicorn_bin} -c spec/unicorn.test.conf -D config.ru}
-    sh "#{FileUtils::RUBY} spec/reporter_spec.rb"
+    sh "#{ruby} spec/reporter_spec.rb"
   ensure
     sh %{kill `cat spec/unicorn.test.pid`}
   end
@@ -28,7 +30,7 @@ end
 
 desc "Run web specs"
 task :web_spec do
-  sh "#{FileUtils::RUBY} spec/web_spec.rb"
+  sh "#{ruby} spec/web_spec.rb"
 end
 
 desc "Run all specs"

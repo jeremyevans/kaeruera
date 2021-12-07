@@ -1,5 +1,4 @@
 ENV['RACK_ENV'] = 'test'
-require_relative 'warnings_helper'
 require_relative '../models'
 include KaeruEra
 
@@ -44,7 +43,7 @@ describe Application do
   end
 
   it "should have token set when saving" do
-    Application.first.token.must_match /\A[a-f0-9]{40}\z/
+    Application.first.token.must_match(/\A[a-f0-9]{40}\z/)
   end
 end
 

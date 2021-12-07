@@ -1,5 +1,4 @@
 ENV['RACK_ENV'] = 'test'
-require_relative 'warnings_helper'
 require_relative '../db'
 require_relative '../lib/kaeruera/database_reporter'
 

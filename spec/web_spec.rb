@@ -1,5 +1,4 @@
 ENV['RACK_ENV'] = 'test'
-require_relative 'warnings_helper'
 require 'capybara'
 require 'capybara/dsl'
 require 'rack/test'
@@ -60,11 +59,11 @@ describe KaeruEra do
     fill_in 'email', :with=>'k'
     fill_in 'password', :with=>'secret'
     click_on 'Login'
-    page.html.must_match /no matching login/
+    page.html.must_match(/no matching login/)
     fill_in 'email', :with=>'kaeruera'
     fill_in 'password', :with=>'secet'
     click_on 'Login'
-    page.html.must_match /invalid password/
+    page.html.must_match(/invalid password/)
   end
 end
 
@@ -74,7 +73,7 @@ describe KaeruEra do
   end
 
   it "should be able to logout" do
-    page.html.must_match /You have been logged in/
+    page.html.must_match(/You have been logged in/)
     click_button 'Logout'
     page.current_path.must_equal '/login'
     click_link 'KaeruEra'
@@ -86,11 +85,11 @@ describe KaeruEra do
     click_link 'KaeruEra'
     click_link 'KaeruEraApp'
     cells = all('td').map{|s| s.text}
-    cells[0].must_match /\d+/
+    cells[0].must_match(/\d+/)
     cells[1].must_equal 'Sequel::NoMatchingRow'
     cells[2].must_equal 'Sequel::NoMatchingRow' 
     cells[3].must_equal 'Open'
-    cells[4].must_match /\A#{Date.today}/
+    cells[4].must_match(/\A#{Date.today}/)
   end
 
   it "should allow viewing most recent errors for application" do
@@ -98,9 +97,9 @@ describe KaeruEra do
     cells = all('td').map{|s| s.text}
     cells[0].must_equal error_id
     cells[1].must_equal 'RuntimeError'
-    cells[2].must_match /foo/ 
+    cells[2].must_match(/foo/) 
     cells[3].must_equal 'Open'
-    cells[4].must_match /\A#{Date.today}/
+    cells[4].must_match(/\A#{Date.today}/)
   end
 
   it "should allow viewing specific error for application" do
@@ -111,13 +110,13 @@ describe KaeruEra do
     info[0].must_equal 'User: kaeruera'
     info[1].must_equal 'Application: KaeruEraApp'
     info[2].must_equal 'Class: RuntimeError'
-    info[3].must_match /\AMessage:.+foo/
+    info[3].must_match(/\AMessage:.+foo/)
     info[4].must_equal 'Status: Open'
-    info[5].must_match /\AOccured On:\s+\d+\s+-\s+\d+\s+-\s+\d+\s+T\s+\d+\s+:\s+\d+\s+:\s+\d+/
+    info[5].must_match(/\AOccured On:\s+\d+\s+-\s+\d+\s+-\s+\d+\s+T\s+\d+\s+:\s+\d+\s+:\s+\d+/)
 
     bt = all("#content ol li").map{|s| s.text}
-    bt[0].must_match /spec\/web_spec.rb/
-    bt[-1].must_match /<main>|spec/
+    bt[0].must_match(/spec\/web_spec.rb/)
+    bt[-1].must_match(/<main>|spec/)
 
     tables = all("#content table")
     tables[0].all("td").map{|s| s.text}.must_equal %w'banana 123'
@@ -130,31 +129,31 @@ describe KaeruEra do
     click_link error_id
 
     click_link 'KaeruEraApp'
-    page.html.must_match /Open Errors for KaeruEraApp/
+    page.html.must_match(/Open Errors for KaeruEraApp/)
     click_link error_id
 
     click_link 'RuntimeError'
-    page.html.must_match /Error Search Results/
+    page.html.must_match(/Error Search Results/)
     click_link error_id
 
     (2..8).each do |i|
       all("#content ul li a")[i].click
-      page.html.must_match /Error Search Results/
+      page.html.must_match(/Error Search Results/)
       click_link error_id
     end
 
     all("#content ol li a")[0].click
-    page.html.must_match /Error Search Results/
+    page.html.must_match(/Error Search Results/)
     click_link error_id
 
     click_link 'grapes'
-    page.html.must_match /Error Search Results/
+    page.html.must_match(/Error Search Results/)
     click_link error_id
 
     click_link 'watermelon'
-    page.html.must_match /Error Search Results/
+    page.html.must_match(/Error Search Results/)
     click_link error_id
-    page.html.must_match /Error #{error_id}/
+    page.html.must_match(/Error #{error_id}/)
   end
 
   it "should allow searching for errors" do
@@ -173,7 +172,7 @@ describe KaeruEra do
     select 'Closed'
     click_button 'Search'
     all('#content tr').size.must_equal 0
-    page.html.must_match /No errors matching your search criteria/
+    page.html.must_match(/No errors matching your search criteria/)
 
     click_link 'Search'
     fill_in 'Error Class', :with=>'RuntimeError'
@@ -255,9 +254,9 @@ describe KaeruEra do
     fill_in 'Notes', :with=>'foobar'
     click_button 'Update Error'
 
-    page.html.must_match /Error Updated/
-    page.html.must_match /Status: Open/
-    find('textarea').text.must_match /foobar/
+    page.html.must_match(/Error Updated/)
+    page.html.must_match(/Status: Open/)
+    find('textarea').text.must_match(/foobar/)
   end
 
   it "should closing specific errors" do
@@ -267,9 +266,9 @@ describe KaeruEra do
     check 'Close Error?'
     click_button 'Update Error'
 
-    page.html.must_match /Error Updated/
-    page.html.must_match /Status: Closed/
-    page.html.must_match /Error Notes.+foobar/m
+    page.html.must_match(/Error Updated/)
+    page.html.must_match(/Status: Closed/)
+    page.html.must_match(/Error Notes.+foobar/m)
   end
 
   it "should allowing changing passwords" do
@@ -278,16 +277,16 @@ describe KaeruEra do
     fill_in 'New Password', :with=>'something'
     fill_in 'Confirm Password', :with=>'something'
     click_button 'Change Password'
-    page.html.must_match /Your password has been changed/
+    page.html.must_match(/Your password has been changed/)
 
     click_button 'Logout'
     login
-    page.html.must_match /invalid password/
+    page.html.must_match(/invalid password/)
 
     fill_in 'email', :with=>'kaeruera'
     fill_in 'password', :with=>'something'
     click_on 'Login'
-    page.html.must_match /You have been logged in/
+    page.html.must_match(/You have been logged in/)
   end
 
   it "should allowing viewing reporter information for application" do
@@ -301,9 +300,9 @@ describe KaeruEra do
     click_link 'Add Application'
     fill_in 'Application Name', :with=>'FooBar'
     click_button 'Add Application'
-    page.html.must_match /Application Added/
+    page.html.must_match(/Application Added/)
     click_link 'FooBar'
-    page.html.must_match /No open errors for FooBar/
+    page.html.must_match(/No open errors for FooBar/)
   end
 end
 
@@ -385,7 +384,7 @@ describe KaeruEra do
     click_link 'Next Page'
     click_link 'Next Page'
     click_link error_id
-    page.html.must_match /foobarbaz/
+    page.html.must_match(/foobarbaz/)
 
     click_link 'RuntimeError'
     click_link 'Show All Errors in this Search'
@@ -395,6 +394,6 @@ describe KaeruEra do
     KaeruEra::DB[:errors].where(:notes=>'foobar', :closed=>true).count.must_equal 51
 
     click_link 'KaeruEraApp'
-    page.html.must_match /No open errors for KaeruEraApp/
+    page.html.must_match(/No open errors for KaeruEraApp/)
   end
 end
