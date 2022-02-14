@@ -30,8 +30,8 @@ else
   Refrigerator.freeze_core(:except=>['BasicObject'])
 end
 
-Capybara.app = KaeruEra::App
-KaeruEra::App.freeze
+Capybara.app = KaeruEra::App.freeze.app
+Capybara.exact = true
 
 class Minitest::Spec
   include Rack::Test::Methods
@@ -298,7 +298,7 @@ describe KaeruEra do
 
   it "should allow creating new applications" do
     click_link 'Add Application'
-    fill_in 'Application Name', :with=>'FooBar'
+    fill_in 'Application Name*', :with=>'FooBar'
     click_button 'Add Application'
     page.html.must_match(/Application Added/)
     click_link 'FooBar'
