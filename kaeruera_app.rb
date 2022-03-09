@@ -210,8 +210,8 @@ module KaeruEra
       end
 
       r.assets
-      check_csrf!
       r.rodauth
+      check_csrf!
       rodauth.require_authentication
 
       r.is 'add_application' do
