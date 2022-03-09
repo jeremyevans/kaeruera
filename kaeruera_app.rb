@@ -25,7 +25,6 @@ module KaeruEra
     end
 
     plugin :route_csrf
-    plugin :hash_routes
     plugin :direct_call
     plugin :not_found
     plugin :error_handler
@@ -183,87 +182,6 @@ module KaeruEra
       csp.frame_ancestors :none
     end
 
-    hash_routes :root do
-      is 'add_application' do |r|
-        @app = Application.new(:user_id=>session['user_id'])
-
-        r.get do
-          :add_application
-        end
-
-        r.post do
-          forme_set(@app).save
-          flash['notice'] = "Application Added"
-          r.redirect('/', 303)
-        end
-      end
-
-      get "" do
-        @apps = user_apps.order(:name).all
-        :applications
-      end
-
-      on 'applications' do |r|
-        r.on Integer do |id|
-          @app = Application.first!(:user_id=>session['user_id'], :id=>id)
-
-          r.get 'reporter_info' do
-            :reporter_info
-          end
-
-          r.get 'errors' do
-            @errors = paginator(@app.app_errors_dataset.open.most_recent)
-            :errors
-          end
-        end
-      end
-
-      on 'error' do |r|
-        r.get Integer do |id|
-          @error = get_error(id)
-          :error
-        end
-      end
-
-      get 'search' do
-        if search = tp.nonempty_str('search')
-          search_opts = tp.convert!(:symbolize=>true) do |tp|
-            tp.pos_int(%w'application')
-            tp.nonempty_str(%w'error_class message backtrace field key field_type value')
-            tp.bool('closed')
-            tp.time(%w'occurred_after occurred_before')
-          end
-          @errors = paginator(Error.search(search_opts, session['user_id']).most_recent)
-          :errors
-        else
-          @apps = user_apps.order(:name).all
-          :search
-        end
-      end
-
-      on 'update_error' do |r|
-        r.post Integer do |id|
-          @error = get_error(id)
-          r.halt(403, view(:content=>"Error Not Open")) if @error.closed
-          @error.closed = true if tp.bool('close')
-          forme_set(@error).save_changes
-          flash['notice'] = "Error Updated"
-          r.redirect("/error/#{@error.id}")
-        end
-      end
-
-      post 'update_multiple_errors' do
-        h = {:notes=>tp.str!('notes')}
-        h[:closed] = true if tp.bool('close')
-        n = Error.
-          with_user(session['user_id']).
-          where(:id=>tp.array!(:pos_int, 'ids'), :closed=>false).
-          update(h)
-        flash['notice'] = "Updated #{n} errors"
-        r.redirect("/")
-      end
-    end
-
     route do |r|
       r.post 'report_error' do
         params = JSON.parse(r.body.read)
@@ -296,7 +214,78 @@ module KaeruEra
       r.rodauth
       rodauth.require_authentication
 
-      r.hash_routes(:root)
+      r.is 'add_application' do
+        @app = Application.new(:user_id=>session['user_id'])
+
+        r.get do
+          :add_application
+        end
+
+        r.post do
+          forme_set(@app).save
+          flash['notice'] = "Application Added"
+          r.redirect('/', 303)
+        end
+      end
+
+      r.root do
+        @apps = user_apps.order(:name).all
+        :applications
+      end
+
+      r.on 'applications', Integer do |id|
+        @app = Application.first!(:user_id=>session['user_id'], :id=>id)
+
+        r.get 'reporter_info' do
+          :reporter_info
+        end
+
+        r.get 'errors' do
+          @errors = paginator(@app.app_errors_dataset.open.most_recent)
+          :errors
+        end
+      end
+
+      r.get 'error', Integer do |id|
+        @error = get_error(id)
+        :error
+      end
+
+      r.get 'search' do
+        if search = tp.nonempty_str('search')
+          search_opts = tp.convert!(:symbolize=>true) do |tp|
+            tp.pos_int(%w'application')
+            tp.nonempty_str(%w'error_class message backtrace field key field_type value')
+            tp.bool('closed')
+            tp.time(%w'occurred_after occurred_before')
+          end
+          @errors = paginator(Error.search(search_opts, session['user_id']).most_recent)
+          :errors
+        else
+          @apps = user_apps.order(:name).all
+          :search
+        end
+      end
+
+      r.post 'update_error', Integer do |id|
+        @error = get_error(id)
+        r.halt(403, view(:content=>"Error Not Open")) if @error.closed
+        @error.closed = true if tp.bool('close')
+        forme_set(@error).save_changes
+        flash['notice'] = "Error Updated"
+        r.redirect("/error/#{@error.id}")
+      end
+
+      r.post 'update_multiple_errors' do
+        h = {:notes=>tp.str!('notes')}
+        h[:closed] = true if tp.bool('close')
+        n = Error.
+          with_user(session['user_id']).
+          where(:id=>tp.array!(:pos_int, 'ids'), :closed=>false).
+          update(h)
+        flash['notice'] = "Updated #{n} errors"
+        r.redirect("/")
+      end
     end
   end
 end
