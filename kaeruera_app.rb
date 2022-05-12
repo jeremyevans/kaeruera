@@ -1,6 +1,6 @@
-require 'roda'
 require_relative 'models'
 require_relative 'lib/kaeruera/database_reporter'
+require 'roda'
 
 module KaeruEra
   class App < Roda
