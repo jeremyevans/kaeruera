@@ -18,5 +18,5 @@ group :development, :test do
   gem 'minitest-hooks', '>= 1.1.0'
   gem "minitest-global_expectations"
   gem 'capybara', '>=2.1.0'
-  gem 'capybara-validate_html5'
+  gem 'capybara-validate_html5', '>= 1.1.0'
 end
