@@ -24,15 +24,13 @@ Sequel.migration do
       String :error_class, :null=>false, :index=>true
       String :message, :null=>false, :index=>true
       column :backtrace , 'text[]', :null=>false, :index=>{:type=>:gin}
-      hstore :env, :index=>{:type=>:gist}
-      json :params
-      json :session
+      jsonb :env, :index=>{:type=>:gin}
+      jsonb :params, :index=>{:type=>:gin}
+      jsonb :session, :index=>{:type=>:gin}
+
       String :notes
 
       foreign_key [:user_id, :application_id], :applications, :key=>[:user_id, :id]
-
-      full_text_index Sequel.cast(:params, String), :index_type=>:gist, :name=>:errors_params_index
-      full_text_index Sequel.cast(:session, String), :index_type=>:gist, :name=>:errors_session_index
     end
   end
 end
