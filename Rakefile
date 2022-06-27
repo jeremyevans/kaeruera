@@ -122,5 +122,6 @@ task :spec_ci do
   ENV['KAERUERA_SESSION_SECRET'] = '1'*64
   ENV['KAERUERA_DATABASE_URL'] = "postgres://localhost/?user=postgres&password=postgres"
   migrate.call('test', nil)
+  ENV['KAERUERA_DATABASE_URL'] = "postgres://localhost/?user=postgres&password=postgres"
   Rake::Task['default'].invoke
 end
