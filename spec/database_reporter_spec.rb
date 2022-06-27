@@ -1,5 +1,6 @@
 ENV['RACK_ENV'] = 'test'
 require_relative '../db'
+require_relative 'coverage_helper'
 require_relative '../lib/kaeruera/database_reporter'
 
 TRANSACTIONAL_TESTS = true

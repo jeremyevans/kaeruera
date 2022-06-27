@@ -56,9 +56,11 @@ module KaeruEra
       req.body = {:data=>h, :id=>@application_id, :token=>@token}.to_json
       req['Content-Type'] = 'application/json'
       req['Accept'] = 'application/json'
-      req.basic_auth(url.user, url.password) if url.user
       http = Net::HTTP.new(url.host, url.port)
+      # :nocov:
+      req.basic_auth(url.user, url.password) if url.user
       http.use_ssl = true if url.scheme == 'https'
+      # :nocov:
       res = http.start do
         http.request(req)
       end
