@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'rake'
 gem 'pg'
 gem 'sequel', '>= 5.35'
 gem 'sequel_pg', '>= 1.7'

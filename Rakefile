@@ -51,13 +51,6 @@ task :reporter_spec_cov do
   end
 end
 
-desc "Run specs in CI"
-task :spec_ci do
-  ENV['KAERUERA_SESSION_SECRET'] = '1'*64
-  ENV['KAERUERA_DATABASE_URL'] = "postgres://localhost/?user=postgres&password=postgres"
-  Rake::Task['default'].invoke
-end
-
 # Migrations
 
 migrate = lambda do |env, version|
@@ -106,7 +99,7 @@ task :production_up do
   migrate.call('production', nil)
 end
 
-# Assets
+# Other
 
 namespace :assets do
   desc "Precompile the assets"
@@ -122,4 +115,12 @@ task "annotate" do
   require_relative 'models'
   require 'sequel/annotate'
   Sequel::Annotate.annotate(Dir['models/*.rb'], :namespace=>true)
+end
+
+desc "Run specs in CI"
+task :spec_ci do
+  ENV['KAERUERA_SESSION_SECRET'] = '1'*64
+  ENV['KAERUERA_DATABASE_URL'] = "postgres://localhost/?user=postgres&password=postgres"
+  migrate.call('test', nil)
+  Rake::Task['default'].invoke
 end
