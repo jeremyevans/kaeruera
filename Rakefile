@@ -51,6 +51,13 @@ task :reporter_spec_cov do
   end
 end
 
+desc "Run specs in CI"
+task :spec_ci do
+  ENV['KAERUERA_SESSION_SECRET'] = '1'*64
+  ENV['KAERUERA_DATABASE_URL'] = "postgres://localhost/?user=postgres&password=postgres"
+  Rake::Task['default'].invoke
+end
+
 # Migrations
 
 migrate = lambda do |env, version|
