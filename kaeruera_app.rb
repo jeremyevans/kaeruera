@@ -28,7 +28,7 @@ module KaeruEra
     plugin :direct_call
     plugin :not_found
     plugin :error_handler
-    plugin :render, :escape=>:erubi
+    plugin :render, :escape=>true, :template_opts=>{:chain_appends=>true}
     plugin :assets,
       :css=>%w'application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},
