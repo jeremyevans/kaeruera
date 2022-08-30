@@ -24,6 +24,7 @@ module KaeruEra
       DEMO_MODE = false
     end
 
+    plugin :public
     plugin :route_csrf
     plugin :direct_call
     plugin :not_found
@@ -210,6 +211,7 @@ module KaeruEra
       end
 
       r.assets
+      r.public
       r.rodauth
       check_csrf!
       rodauth.require_authentication
