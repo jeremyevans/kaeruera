@@ -47,6 +47,7 @@ module KaeruEra
     plugin :forme_set, secret: ENV['KAERUERA_SESSION_SECRET']
     plugin :symbol_views
     plugin :request_aref, :raise
+    plugin :disallow_file_uploads
     plugin :typecast_params
     alias tp typecast_params
 
