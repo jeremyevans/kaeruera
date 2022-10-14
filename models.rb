@@ -15,7 +15,6 @@ module KaeruEra
   Model = Class.new(Sequel::Model)
   Model.db = DB
   Model.plugin :auto_validations
-  Model.plugin :prepared_statements
   Model.plugin :forme
   Model.plugin :forme_set
   Model.plugin :subclasses

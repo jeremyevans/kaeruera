@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'pg'
-gem 'sequel', '>= 5.59'
+gem 'sequel', '>= 5.62'
 gem 'sequel_pg', '>= 1.7'
 gem 'roda', '>= 3.35'
 gem 'rodauth', '>= 2'
