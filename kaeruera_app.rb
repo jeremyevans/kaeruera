@@ -195,7 +195,7 @@ module KaeruEra
           :application_id=>app.id,
           :error_class=>data['error_class'],
           :message=>data['message'],
-          :backtrace=>Sequel.pg_array(data['backtrace'])
+          :backtrace=>Sequel.pg_array(data['backtrace'], :text)
         }
 
         if v = data['params']
