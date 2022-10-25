@@ -48,7 +48,8 @@ module KaeruEra
     plugin :symbol_views
     plugin :request_aref, :raise
     plugin :disallow_file_uploads
-    plugin :typecast_params
+    plugin :Integer_matcher_max
+    plugin :typecast_params_sized_integers, :sizes=>[64], :default_size=>64
     alias tp typecast_params
 
     logger = case ENV['RACK_ENV']
