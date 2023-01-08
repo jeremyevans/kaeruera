@@ -38,7 +38,4 @@ if ENV['RACK_ENV'] == 'development'
     u = KaeruEra::User.create(:email=>'kaeruera', :password=>'kaeruera')
     u.add_application(:name=>'KaeruEraApp')
   end
-else
-  KaeruEra::Model.freeze_descendents
-  KaeruEra::DB.freeze
 end

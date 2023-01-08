@@ -6,6 +6,7 @@ require_relative '../lib/kaeruera/database_reporter'
 TRANSACTIONAL_TESTS = true
 require_relative 'spec_helper'
 require_relative 'shared_lib_spec'
+require_relative 'model_freeze'
 
 include KaeruEra
 

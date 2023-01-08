@@ -4,6 +4,12 @@ require 'roda'
 
 module KaeruEra
   class App < Roda
+    def self.freeze
+      KaeruEra::Model.freeze_descendents
+      KaeruEra::DB.freeze
+      super
+    end
+
     opts[:root] = File.dirname(__FILE__)
     opts[:check_dynamic_arity] = false
     opts[:check_arity] = :warn

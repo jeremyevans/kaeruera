@@ -8,6 +8,7 @@ include KaeruEra
 
 require_relative 'spec_helper'
 require_relative 'shared_lib_spec'
+require_relative 'model_freeze'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 user_id = DB[:users].insert(:email=>'ke', :password_hash=>'secret')

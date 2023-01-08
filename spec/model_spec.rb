@@ -4,6 +4,7 @@ include KaeruEra
 
 TRANSACTIONAL_TESTS = true
 require_relative 'spec_helper'
+require_relative 'model_freeze'
 
 [:errors, :applications, :users].each{|t| DB[t].delete}
 raise 'foo' rescue User.create(:email=>'ke', :password=>'secret').
