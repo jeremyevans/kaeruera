@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module KaeruEra
 # Represents an application which will be reporting errors to KaeruEra.
 class Application < Model

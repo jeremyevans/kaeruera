@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ENV['RACK_ENV'] = 'test'
 require_relative '../db'
 require_relative 'coverage_helper'

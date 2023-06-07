@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ENV['RACK_ENV'] = 'test'
 require 'capybara'
 require 'capybara/dsl'

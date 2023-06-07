@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module KaeruEra
 # Separates access to applications based on specific login information.
 class User < Model

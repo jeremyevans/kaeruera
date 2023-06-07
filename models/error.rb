@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module KaeruEra
 # Represents a specific ruby exception raised by an application which
 # is reporting errors to KaeruEra.
