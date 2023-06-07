@@ -18,6 +18,13 @@ raise 'foo' rescue User.create(:email=>'ke', :password=>'secret').
                 :backtrace=>Sequel.pg_array($!.backtrace))
 user_id = User.first.id
 
+begin
+  require 'refrigerator'
+rescue LoadError
+else
+  Refrigerator.freeze_core
+end
+
 describe User do
   it "should have working associations" do
     User.first.applications.must_equal Application.all
