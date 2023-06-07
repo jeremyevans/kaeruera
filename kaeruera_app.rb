@@ -3,6 +3,10 @@ require_relative 'models'
 require_relative 'lib/kaeruera/database_reporter'
 require 'roda'
 
+require 'tilt'
+require 'tilt/erubi'
+require 'tilt/string'
+
 module KaeruEra
   class App < Roda
     def self.freeze
@@ -36,7 +40,7 @@ module KaeruEra
     plugin :direct_call
     plugin :not_found
     plugin :error_handler
-    plugin :render, :escape=>true, :template_opts=>{:chain_appends=>true}
+    plugin :render, :escape=>true, :template_opts=>{:chain_appends=>true, :freeze=>true, :skip_compiled_encoding_detection=>true}
     plugin :assets,
       :css=>%w'application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},

@@ -24,6 +24,7 @@ error_id = KaeruEra::DB[:errors].max(:id).to_s
 Gem.suffix_pattern
 
 require_relative '../kaeruera_app'
+Tilt.finalize!
 
 begin
   require 'refrigerator'
