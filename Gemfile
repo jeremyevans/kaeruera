@@ -13,6 +13,7 @@ gem 'forme', '>= 1.11'
 gem 'bcrypt'
 gem 'json'
 gem 'unicorn'
+gem 'logger'
 
 group :development, :test do
   gem 'minitest'
