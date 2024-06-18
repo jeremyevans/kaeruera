@@ -23,7 +23,7 @@ module KaeruEra
     # The reporter used for reporting internal errors.  Defaults to the same database
     # used to store the errors for the applications that this server tracks.  This
     # causes obvious issues if the Database for this server goes down.
-    REPORTER = (DatabaseReporter.new(DB, ENV['KAERUERA_INTERNAL_ERROR_USER']||'kaeruera', 'KaeruEraApp') rescue nil)
+    opts[:internal_errors] = {:reporter => (DatabaseReporter.new(DB, ENV['KAERUERA_INTERNAL_ERROR_USER']||'kaeruera', 'KaeruEraApp') rescue nil)}
 
     # The number of errors to show per page on the application and search result pages.
     # Currently hardcoded, but will probably be made user specific at some point.
@@ -65,8 +65,9 @@ module KaeruEra
     plugin :typecast_params_sized_integers, :sizes=>[64], :default_size=>64
     alias tp typecast_params
 
-    logger = case ENV['RACK_ENV']
-    when 'development', 'test' # Remove development after Unicorn 5.5+
+    logger = if ENV['MULTITHREADED_TRANSACTIONAL_TEST']
+      Logger.new('spec/puma.test.log')
+    elsif ENV['RACK_ENV'] == 'test'
       Class.new{def write(_) end}.new
     else
       $stderr
@@ -164,8 +165,8 @@ module KaeruEra
         response.status = 400
         view(:content=>"<h1>Invalid parameter submitted: #{h e.param_name}</h1>")
       else
-        if REPORTER
-          REPORTER.report(:params=>r.params, :env=>env, :session=>session, :error=>e)
+        if reporter = opts[:internal_errors][:reporter]
+          reporter.report(:params=>r.params, :env=>env, :session=>session, :error=>e)
         end
         $stderr.puts "#{e.class}: #{e.message}", e.backtrace unless ENV['RACK_ENV'] == 'test'
         next exception_page(e, :assets=>true) if ENV['RACK_ENV'] == 'development'

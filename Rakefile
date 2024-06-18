@@ -13,23 +13,9 @@ task :database_reporter_spec do
   sh "#{ruby} spec/database_reporter_spec.rb"
 end
 
-reporter_spec = lambda do |&block|
-  sh %{echo > spec/unicorn.test.log}
-  begin
-    ENV['KAERUERA_SESSION_SECRET'] = '1'*64
-    unicorn_bin = File.basename(FileUtils::RUBY).sub(/\Aruby/, 'unicorn')
-    sh %{#{FileUtils::RUBY} -S #{unicorn_bin} -c spec/unicorn.test.conf -D config.ru}
-    block.call if block
-  ensure
-    sh %{kill `cat spec/unicorn.test.pid`}
-  end
-end
-
 desc "Run reporter specs"
 task "reporter_spec" do |t|
-  reporter_spec.call do
-    sh "#{ruby} spec/reporter_spec.rb"
-  end
+  sh "#{ruby} spec/reporter_spec.rb"
 end
 
 desc "Run web specs"
@@ -44,11 +30,8 @@ desc "Run specs with coverage"
 task :reporter_spec_cov do
   ENV['COVERAGE'] = 'database'
   sh "#{ruby} spec/database_reporter_spec.rb"
-  ENV.delete('COVERAGE')
-  reporter_spec.call do
-    ENV['COVERAGE'] = 'web'
-    sh "#{ruby} spec/reporter_spec.rb"
-  end
+  ENV['COVERAGE'] = 'web'
+  sh "#{ruby} spec/reporter_spec.rb"
 end
 
 # Migrations

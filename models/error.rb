@@ -33,7 +33,7 @@ class Error < Model
 
     # Return dataset in reverse chronological order.
     def most_recent
-      reverse_order(:created_at)
+      reverse_order(:id)
     end
 
     # Return dataset without closed errors.

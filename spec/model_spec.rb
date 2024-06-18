@@ -3,20 +3,24 @@ ENV['RACK_ENV'] = 'test'
 require_relative '../models'
 include KaeruEra
 
-TRANSACTIONAL_TESTS = true
 require_relative 'spec_helper'
 require_relative 'model_freeze'
 
-[:errors, :applications, :users].each{|t| DB[t].delete}
-raise 'foo' rescue User.create(:email=>'ke', :password=>'secret').
-  add_application(:name=>'app').
-  add_app_error(:error_class=>$!.class,
-                :message=>$!.message,
-                :env=>Sequel.pg_jsonb('grapes'=>'watermelon'),
-                :params=>Sequel.pg_jsonb('banana'=>'apple'),
-                :session=>Sequel.pg_jsonb('pear'=>'papaya'),
-                :backtrace=>Sequel.pg_array($!.backtrace))
-user_id = User.first.id
+class Minitest::HooksSpec
+  before(:all) do
+    raise 'foo' rescue User.create(:email=>'ke', :password=>'secret').
+      add_application(:name=>'app').
+      add_app_error(:error_class=>$!.class,
+                    :message=>$!.message,
+                    :env=>Sequel.pg_jsonb('grapes'=>'watermelon'),
+                    :params=>Sequel.pg_jsonb('banana'=>'apple'),
+                    :session=>Sequel.pg_jsonb('pear'=>'papaya'),
+                    :backtrace=>Sequel.pg_array($!.backtrace[0...1]))
+    @user_id = User.first.id
+  end
+
+  attr_reader :user_id
+end
 
 begin
   require 'refrigerator'
@@ -152,7 +156,7 @@ describe Error do
 
   it ".most_recent should most recent errors" do
     Error.most_recent.first.must_equal Error.first
-    raise 'foo' rescue (Application.first.add_app_error(:error_class=>$!.class, :message=>$!.message, :backtrace=>Sequel.pg_array($!.backtrace)))
+    raise 'bar' rescue (Application.first.add_app_error(:error_class=>$!.class, :message=>$!.message, :backtrace=>Sequel.pg_array($!.backtrace)))
     Error.most_recent.first.wont_equal Error.first
   end
 

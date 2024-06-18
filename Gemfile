@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'pg'
-gem 'sequel', '>= 5.62'
+gem 'sequel', '>= 5.81'
 gem 'sequel_pg', '>= 1.7', require: nil
 gem 'roda', '>= 3.62'
 gem 'rodauth', '>= 2'
@@ -12,7 +12,7 @@ gem 'erubi', '>= 1.13'
 gem 'forme', '>= 2.6'
 gem 'bcrypt'
 gem 'json'
-gem 'unicorn'
+gem 'puma'
 gem 'logger'
 
 group :development, :test do

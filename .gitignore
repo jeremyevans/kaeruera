@@ -1,4 +1,4 @@
 /.env.rb
 /kaeruera-*.gem
-/spec/unicorn.test.log
+/spec/puma.test.log
 /coverage

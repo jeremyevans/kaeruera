@@ -5,21 +5,26 @@ require 'capybara/dsl'
 require 'capybara/optionally_validate_html5'
 require 'rack/test'
 
-TRANSACTIONAL_TESTS = true
 RESET_DRIVER = true
 require_relative 'spec_helper'
 require_relative '../models'
 
-[:errors, :applications, :users].each{|t| KaeruEra::DB[t].delete}
-raise 'foo' rescue KaeruEra::User.create(:email=>'kaeruera', :password=>'secret').
-  add_application(:name=>'KaeruEraApp').
-  add_app_error(:error_class=>$!.class,
-                :message=>$!.message,
-                :env=>Sequel.pg_jsonb('grapes'=>'watermelon'),
-                :params=>Sequel.pg_jsonb('banana'=>123),
-                :session=>Sequel.pg_jsonb('pear'=>nil),
-                :backtrace=>Sequel.pg_array($!.backtrace))
-error_id = KaeruEra::DB[:errors].max(:id).to_s
+class Minitest::HooksSpec
+  before(:all) do
+    raise 'foo' rescue KaeruEra::User.create(:email=>'kaeruera', :password=>'secret').
+      add_application(:name=>'KaeruEraApp').
+      add_app_error(:error_class=>$!.class,
+                    :message=>$!.message,
+                    :env=>Sequel.pg_jsonb('grapes'=>'watermelon'),
+                    :params=>Sequel.pg_jsonb('banana'=>123),
+                    :session=>Sequel.pg_jsonb('pear'=>nil),
+                    :backtrace=>Sequel.pg_array($!.backtrace[0...1]))
+    @error_id = KaeruEra::DB[:errors].max(:id).to_s
+    KaeruEra::App.opts[:internal_errors][:reporter] = KaeruEra::DatabaseReporter.new(KaeruEra::DB, 'kaeruera', 'KaeruEraApp')
+  end
+
+  attr_reader :error_id
+end
 
 Gem.suffix_pattern
 
