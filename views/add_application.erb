@@ -1,5 +1,5 @@
 <% @title = 'Add Application' %>
 
-<% form(@app, {:class=>"form-horizontal"}, :button=>{:value=>"Add Application", :class=>"btn btn-primary"}) do |f| %>
+<%== form(@app, {:class=>"form-horizontal"}, :button=>{:value=>"Add Application", :class=>"btn btn-primary"}) do |f| %>
   <%== f.input(:name, :label=>"Application Name", :size=>80) %>
 <% end %>

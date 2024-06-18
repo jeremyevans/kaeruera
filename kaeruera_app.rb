@@ -6,6 +6,7 @@ require 'roda'
 require 'tilt'
 require 'tilt/erubi'
 require 'tilt/string'
+require 'erubi/capture_block'
 
 module KaeruEra
   class App < Roda
@@ -40,7 +41,7 @@ module KaeruEra
     plugin :direct_call
     plugin :not_found
     plugin :error_handler
-    plugin :render, :escape=>true, :template_opts=>{:chain_appends=>true, :freeze=>true, :skip_compiled_encoding_detection=>true}
+    plugin :render, :escape=>true, :template_opts=>{:chain_appends=>true, :freeze=>true, :skip_compiled_encoding_detection=>true, :engine_class=>Erubi::CaptureBlockEngine}
     plugin :assets,
       :css=>%w'application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},
@@ -56,6 +57,7 @@ module KaeruEra
     plugin :halt
     plugin :json
     plugin :forme_set, secret: ENV['KAERUERA_SESSION_SECRET']
+    plugin :forme_erubi_capture_block
     plugin :symbol_views
     plugin :request_aref, :raise
     plugin :disallow_file_uploads

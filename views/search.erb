@@ -1,6 +1,6 @@
 <% @title = 'Search' %>
 
-<% form({:action=>'/search', :class=>'forme search'}, :button=>{:class=>'btn btn-primary', :name=>'search', :value=>'Search'}) do |f| %>
+<%== form({:action=>'/search', :class=>'forme search'}, :button=>{:class=>'btn btn-primary', :name=>'search', :value=>'Search'}) do |f| %>
   <%== f.input(:select, :options=>@apps.map{|a| [a.name, a.id]}, :label=>'Application', :name=>'application', :id=>'application', :add_blank=>true) %>
   <%== f.input(:select, :options=>[%w'Closed 1', %w'Open 0'], :label=>'Status', :name=>'closed', :id=>'status', :add_blank=>true) %>
   <%== f.input(:text, :name=>'class', :id=>'class', :label=>'Error Class') %>

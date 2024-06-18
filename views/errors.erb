@@ -42,7 +42,7 @@
   <% end %>
   
   <h2>Update All Open Errors on This Page</h2>
-  <% form({:action=>"/update_multiple_errors", :method=>'post', :class=>'row'}, :wrapper=>nil) do |f| %>
+  <%== form({:action=>"/update_multiple_errors", :method=>'post', :class=>'row'}, :wrapper=>nil) do |f| %>
     <% @errors.each do |e| %>
       <%== f.input(:hidden, :name=>'ids[]', :value=>e.id) unless e.closed %>
     <% end %>
