@@ -20,6 +20,11 @@ class Application < Model
     super
   end
 
+  def validate
+    validates_presence(:name)
+    super
+  end
+
   private
 
   # Set the user_id on the error before saving it.

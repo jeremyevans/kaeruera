@@ -98,11 +98,6 @@ module KaeruEra
       Application.with_user(session['user_id'])
     end
 
-    # Returns the application with the given id for the logged in user.
-    def get_error(id)
-      @error = Error.with_user(session['user_id']).with_pk!(id)
-    end
-
     # Does a simple pagination of the results of the dataset.  This
     # increases the per page limit by one, and if that number of rows
     # are returned, it is obvious that there is another page.  This is
@@ -199,6 +194,14 @@ module KaeruEra
       csp.frame_ancestors :none
     end
 
+    plugin :class_matchers
+    class_matcher Application, Integer do |id|
+      Application.first(:user_id=>session['user_id'], :id=>id)
+    end
+    class_matcher Error, Integer do |id|
+      Error.first(:user_id=>session['user_id'], :id=>id)
+    end
+
     route do |r|
       r.post 'report_error' do
         params = JSON.parse(r.body.read)
@@ -251,8 +254,8 @@ module KaeruEra
         :applications
       end
 
-      r.on 'applications', Integer do |id|
-        @app = Application.first!(:user_id=>session['user_id'], :id=>id)
+      r.on 'applications', Application do |app|
+        @app = app
 
         r.get 'reporter_info' do
           :reporter_info
@@ -264,8 +267,8 @@ module KaeruEra
         end
       end
 
-      r.get 'error', Integer do |id|
-        @error = get_error(id)
+      r.get 'error', Error do |error|
+        @error = error
         :error
       end
 
@@ -285,13 +288,12 @@ module KaeruEra
         end
       end
 
-      r.post 'update_error', Integer do |id|
-        @error = get_error(id)
-        r.halt(403, view(:content=>"Error Not Open")) if @error.closed
-        @error.closed = true if tp.bool('close')
-        forme_set(@error).save_changes
+      r.post 'update_error', Error do |error|
+        r.halt(403, view(:content=>"Error Not Open")) if error.closed
+        error.closed = true if tp.bool('close')
+        forme_set(error).save_changes
         flash['notice'] = "Error Updated"
-        r.redirect("/error/#{@error.id}")
+        r.redirect("/error/#{error.id}")
       end
 
       r.post 'update_multiple_errors' do

@@ -89,15 +89,17 @@ describe KaeruEra do
   end
 
   it "should report internal errors" do
-    visit('/applications/0/errors')
+    visit('/add_application')
+    click_button 'Add Application'
     click_link 'KaeruEra'
     click_link 'KaeruEraApp'
     cells = all('td').map{|s| s.text}
     cells[0].must_match(/\d+/)
-    cells[1].must_equal 'Sequel::NoMatchingRow'
-    cells[2].must_equal 'Sequel::NoMatchingRow' 
+    cells[1].must_equal 'Sequel::ValidationFailed'
+    cells[2].must_equal 'name is not present' 
     cells[3].must_equal 'Open'
     cells[4].must_match(/\A#{Date.today}/)
+    cells.length.must_equal 10
   end
 
   it "should allow viewing most recent errors for application" do

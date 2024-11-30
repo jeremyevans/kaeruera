@@ -4,7 +4,7 @@ gem 'rake'
 gem 'pg'
 gem 'sequel', '>= 5.81'
 gem 'sequel_pg', '>= 1.7', require: nil
-gem 'roda', '>= 3.62'
+gem 'roda', '>= 3.85'
 gem 'rodauth', '>= 2'
 gem 'tilt', '>= 2.2'
 gem 'sassc', '>= 2'
