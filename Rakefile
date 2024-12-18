@@ -2,6 +2,7 @@
 
 ruby = FileUtils::RUBY
 ruby += ' -w' if RUBY_VERSION >= '3'
+ruby += ' -W:strict_unused_block' if RUBY_VERSION >= '3.4'
 
 desc "Run model specs"
 task :model_spec do
