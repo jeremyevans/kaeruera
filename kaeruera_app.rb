@@ -41,7 +41,7 @@ module KaeruEra
     plugin :direct_call
     plugin :not_found
     plugin :error_handler
-    plugin :render, :escape=>true, :template_opts=>{:chain_appends=>true, :freeze=>true, :skip_compiled_encoding_detection=>true, :engine_class=>Erubi::CaptureBlockEngine}
+    plugin :render, :escape=>true, :assume_fixed_locals=>true, :template_opts=>{:chain_appends=>true, :freeze=>true, :skip_compiled_encoding_detection=>true, :engine_class=>Erubi::CaptureBlockEngine, scope_class: self, default_fixed_locals: '()', extract_fixed_locals: true}
     plugin :assets,
       :css=>%w'application.scss',
       :css_opts=>{:style=>:compressed, :cache=>false},
