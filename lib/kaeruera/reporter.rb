@@ -58,10 +58,10 @@ module KaeruEra
       req['Content-Type'] = 'application/json'
       req['Accept'] = 'application/json'
       http = Net::HTTP.new(url.host, url.port)
-      # :nocov:
+      # simplecov:disable
       req.basic_auth(url.user, url.password) if url.user
       http.use_ssl = true if url.scheme == 'https'
-      # :nocov:
+      # simplecov:enable
       res = http.start do
         http.request(req)
       end
