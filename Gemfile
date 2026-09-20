@@ -11,7 +11,7 @@ gem 'sassc', '>= 2'
 gem 'erubi', '>= 1.13'
 gem 'forme', '>= 2.6'
 gem 'bcrypt'
-gem 'json'
+gem 'json', '< 3' # Remove version restriction after Sequel 5.109 release
 gem 'puma'
 gem 'logger'
 
